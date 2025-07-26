@@ -1,0 +1,58 @@
+.bigButton {
+    width: 280px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: #ffffff;
+    border: 2px solid #4CAF50;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .bigButton:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    border-color: #45a049;
+  }
+  
+  .bigButton:active {
+    transform: translateY(-2px);
+  }
+  
+  .icon {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+  }
+  
+  .text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #333;
+    text-align: center;
+  }
+  
+  /* Mobile адаптація */
+  @media (max-width: 768px) {
+    .bigButton {
+      width: 100%;
+      max-width: 280px;
+      height: 160px;
+      padding: 1rem;
+    }
+    
+    .icon {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .text {
+      font-size: 1rem;
+    }
+  }

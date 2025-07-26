@@ -1,0 +1,15 @@
+{
+    // Removed empty 'files' property to avoid errors
+    
+    "compilerOptions": {
+    "jsx": "react",
+    "esModuleInterop": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    }
+  },
+  "include": ["src"]
+  }
+  
+  

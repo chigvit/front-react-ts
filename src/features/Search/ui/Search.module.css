@@ -1,0 +1,36 @@
+/* src/styles/styles.css */
+
+.container {
+  border: 2px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  margin: 0 auto;
+  height: 90vh;
+  align-items: center;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.results_container {
+  width: 95%; /* Займає всю доступну ширину */
+  min-height: 200px; /* Мінімальна висота, щоб не стискалася */
+  max-height: 610px; /* Обмеження по висоті */
+  overflow-y: auto; /* Прокрутка, якщо багато результатів */
+  border: 1px solid #ccc; /* Додає рамку */
+  border-radius: 8px; /* Закруглює кути */
+  padding: 10px; /* Додає відступи */
+  background-color: #f9f9f9; /* Додає фон */
+}
+
+.resultItem {
+  border: 1px solid #ccc; /* Додає рамку */
+  padding: 10px; /* Додає відступи */
+  margin-bottom: 10px; /* Додає відступи між елементами */
+  border-radius: 8px; /* Закруглює кути */
+}

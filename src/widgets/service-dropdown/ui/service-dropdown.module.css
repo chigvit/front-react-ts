@@ -1,0 +1,105 @@
+.dropdownContainer {
+  position: relative;
+  display: inline-block;
+  font-family: Arial, sans-serif;
+}
+
+.dropdownButton {
+  padding: 10px 20px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.dropdownButton:hover {
+  background-color: #4338ca;
+}
+
+.dropdownContent {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 8px;
+  min-width: 300px;
+  z-index: 100;
+  display: flex;
+}
+
+.categoriesWrapper {
+  display: flex;
+  width: 100%;
+}
+
+.categoriesList {
+  list-style: none;
+  padding: 12px 0;
+  margin: 0;
+  border-right: 1px solid #f0f0f0;
+  min-width: 180px;
+}
+
+.categoryItem {
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #333;
+}
+
+.categoryItem:hover {
+  background-color: #f8f9fa;
+  color: #4f46e5;
+}
+
+.servicesList {
+  list-style: none;
+  padding: 12px 0;
+  margin: 0;
+  min-width: 220px;
+}
+
+.serviceItem {
+  padding: 8px 20px;
+}
+
+.serviceLink {
+  display: block;
+  color: #333;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 6px 0;
+}
+
+.serviceLink:hover {
+  color: #4f46e5;
+}
+
+.loading {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+}
+
+.error {
+  padding: 20px;
+  color: #dc2626;
+  text-align: center;
+}
+
+.dropdownButton2 {
+  background: 'white';
+  border: '1px solid #ccc';
+  padding: '0.5rem 1rem';
+  cursor: 'pointer';
+  padding: '6px';
+}
