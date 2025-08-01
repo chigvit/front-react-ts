@@ -5,53 +5,67 @@ import styles from './RegisterPage.module.css';
 import { Header } from '@/widgets/Header';
 import React from 'react';
 
-type RegistrationType = 'customer' | 'worker';
+type UserRole = 'customer' | 'contractor';
 
 export const RegisterPage = () => {
   const [step, setStep] = useState<'select' | 'form'>('select');
-  const [registrationType, setRegistrationType] = useState<RegistrationType | null>(null);
-  const [workerType, setWorkerType] = useState<'master' | 'company'>('master');
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [contractorType, setContractorType] = useState<'master' | 'company'>('master');
 
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     phone: '',
     email: '',
     postcode: '',
+    password: '',
+    confirmPassword: '',
   });
 
   const navigate = useNavigate();
 
-  const handleSelectType = (type: RegistrationType) => {
-    setRegistrationType(type);
+  const handleSelectType = (type: UserRole) => {
+    setUserRole(type);
     setStep('form');
   };
 
+  // ИСПРАВЛЕНО: Используем e.target.name вместо e.target.id
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.id]: e.target.value,
+      [e.target.name]: e.target.value, // Изменено с e.target.id на e.target.name
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (formData.password !== formData.confirmPassword) {
+      alert('Паролі не співпадають!');
+      return;
+    }
 
-    console.log('Дані, які відправляються:', {
-      ...formData,
-      registrationType,
-      workerType: registrationType === 'worker' ? workerType : undefined,
-    });
+    // ИСПРАВЛЕНО: Формируем правильные данные для отправки
+    const submitData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phone: formData.phone,
+      email: formData.email,
+      postcode: formData.postcode,
+      password: formData.password,
+      role: userRole, // Используем актуальное значение userRole
+      contractorType: userRole === 'contractor' ? contractorType : undefined,
+    };
 
-
+    console.log('Дані, які відправляються:', submitData);
 
     try {
-      const response = await fetch('http://localhost:8080/api/register', {
+      const response = await fetch('http://localhost:8080/api/account/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData), // Отправляем правильные данные
       });
 
       if (response.ok) {
@@ -62,7 +76,7 @@ export const RegisterPage = () => {
         alert('Помилка реєстрації: ' + errorText);
       }
     } catch (error) {
-      alert('Помилка з’єднання з сервером');
+      alert('Помилка з\'єднання з сервером');
     }
   };
 
@@ -75,7 +89,7 @@ export const RegisterPage = () => {
           <div className={styles.buttonsContainer}>
             <BigActionButton
               text="Почати заробляти"
-              onClick={() => handleSelectType('worker')}
+              onClick={() => handleSelectType('contractor')}
               iconSrc=""
             />
             <BigActionButton
@@ -88,26 +102,26 @@ export const RegisterPage = () => {
       ) : (
         <div className={styles.formContainer}>
           <h2>
-            {registrationType === 'customer'
+            {userRole === 'customer'
               ? 'Реєстрація замовника'
               : 'Реєстрація працівника'}
           </h2>
 
-          {registrationType === 'worker' && (
+          {userRole === 'contractor' && (
             <div className={styles.workerTypeSelection}>
               <button
                 className={`${styles.workerTypeButton} ${
-                  workerType === 'master' ? styles.active : ''
+                  contractorType === 'master' ? styles.active : ''
                 }`}
-                onClick={() => setWorkerType('master')}
+                onClick={() => setContractorType('master')}
               >
                 Майстер
               </button>
               <button
                 className={`${styles.workerTypeButton} ${
-                  workerType === 'company' ? styles.active : ''
+                  contractorType === 'company' ? styles.active : ''
                 }`}
-                onClick={() => setWorkerType('company')}
+                onClick={() => setContractorType('company')}
               >
                 Компанія
               </button>
@@ -116,12 +130,24 @@ export const RegisterPage = () => {
 
           <form onSubmit={handleSubmit} className={styles.registrationForm}>
             <div className={styles.formGroup}>
-              <label htmlFor="name">Ім'я:</label>
+              <label htmlFor="firstName">Ім'я:</label>
               <input
-                id="name"
+                id="firstName"
+                name="firstName"
                 type="text"
                 required
-                value={formData.name}
+                value={formData.firstName}
+                onChange={handleChange}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="lastName">Прізвище:</label>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                required
+                value={formData.lastName}
                 onChange={handleChange}
               />
             </div>
@@ -129,6 +155,7 @@ export const RegisterPage = () => {
               <label htmlFor="phone">Телефон:</label>
               <input
                 id="phone"
+                name="phone"
                 type="tel"
                 required
                 value={formData.phone}
@@ -139,6 +166,7 @@ export const RegisterPage = () => {
               <label htmlFor="email">Email:</label>
               <input
                 id="email"
+                name="email"
                 type="email"
                 required
                 value={formData.email}
@@ -149,9 +177,32 @@ export const RegisterPage = () => {
               <label htmlFor="postcode">Postcode:</label>
               <input
                 id="postcode"
+                name="postcode"
                 type="text"
                 required
                 value={formData.postcode}
+                onChange={handleChange}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="password">Пароль:</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="confirmPassword">Підтвердіть пароль:</label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                value={formData.confirmPassword}
                 onChange={handleChange}
               />
             </div>

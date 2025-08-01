@@ -1,11 +1,12 @@
 export type RegistrationData = {
-    name: string;
+    firstName: string;
+    lastName: string;
     phone: string;
     email: string;
     postcode: string;
-    type?: 'customer' | 'worker';
-    workerType?: 'specialist' | 'master';
+    type?: 'customer' | 'contractor';
+    contractorType?: 'specialist' | 'master';
   };
   
-  export type RegistrationType = 'customer' | 'worker';
+  export type UserRole = 'customer' | 'contractor';
   export type WorkerType = 'specialist' | 'master';
