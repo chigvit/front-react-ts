@@ -1,6 +1,6 @@
 export type RegistrationData = {
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     phone: string;
     email: string;
     postcode: string;

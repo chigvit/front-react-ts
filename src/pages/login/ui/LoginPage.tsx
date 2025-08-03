@@ -19,8 +19,8 @@ export function RegisterPage() {
             <label htmlFor="password">Password (min. 6 characters)</label>
             <input id="password" name="password" type="password" required />
 
-            <label htmlFor="confirmPassword">Confirm password</label>
-            <input id="confirmPassword" name="confirmPassword" type="password" required />
+            <label htmlFor="confirm_password">Confirm password</label>
+            <input id="confirm_password" name="confirm_password" type="password" required />
         </form>
     )
 }

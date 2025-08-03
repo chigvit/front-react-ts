@@ -13,13 +13,13 @@ export const RegisterPage = () => {
   const [contractorType, setContractorType] = useState<'master' | 'company'>('master');
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     phone: '',
     email: '',
     postcode: '',
     password: '',
-    confirmPassword: '',
+    confirm_password: '',
   });
 
   const navigate = useNavigate();
@@ -40,20 +40,21 @@ export const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.confirm_password) {
       alert('Паролі не співпадають!');
       return;
     }
 
     // ИСПРАВЛЕНО: Формируем правильные данные для отправки
     const submitData = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
+      first_name: formData.first_name,
+      last_name: formData.last_name,
       phone: formData.phone,
       email: formData.email,
       postcode: formData.postcode,
       password: formData.password,
-      role: userRole, // Используем актуальное значение userRole
+      confirm_password: formData.confirm_password,
+      user_role: userRole, // Используем актуальное значение userRole
       contractorType: userRole === 'contractor' ? contractorType : undefined,
     };
 
@@ -130,24 +131,24 @@ export const RegisterPage = () => {
 
           <form onSubmit={handleSubmit} className={styles.registrationForm}>
             <div className={styles.formGroup}>
-              <label htmlFor="firstName">Ім'я:</label>
+              <label htmlFor="first_name">Ім'я:</label>
               <input
-                id="firstName"
-                name="firstName"
+                id="first_name"
+                name="first_name"
                 type="text"
                 required
-                value={formData.firstName}
+                value={formData.first_name}
                 onChange={handleChange}
               />
             </div>
             <div className={styles.formGroup}>
-              <label htmlFor="lastName">Прізвище:</label>
+              <label htmlFor="last_name">Прізвище:</label>
               <input
-                id="lastName"
-                name="lastName"
+                id="last_name"
+                name="last_name"
                 type="text"
                 required
-                value={formData.lastName}
+                value={formData.last_name}
                 onChange={handleChange}
               />
             </div>
@@ -196,13 +197,13 @@ export const RegisterPage = () => {
               />
             </div>
             <div className={styles.formGroup}>
-              <label htmlFor="confirmPassword">Підтвердіть пароль:</label>
+              <label htmlFor="confirm_password">Підтвердіть пароль:</label>
               <input
-                id="confirmPassword"
-                name="confirmPassword"
+                id="confirm_password"
+                name="confirm_password"
                 type="password"
                 required
-                value={formData.confirmPassword}
+                value={formData.confirm_password}
                 onChange={handleChange}
               />
             </div>
