@@ -12,7 +12,6 @@ export const HomePage: React.FC = () => {
         <p className="text-gray-600 mb-6">Welcome to Our Website</p>
        
       </main>
-      
     </div>
   );
 };

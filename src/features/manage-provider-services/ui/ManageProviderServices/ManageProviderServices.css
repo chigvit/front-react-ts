@@ -1,0 +1,107 @@
+/* src/features/manage-provider-services/ui/ManageProviderServices/ManageProviderServices.css */
+
+.manage-services {
+    width: 100%;
+  }
+  
+  .manage-services__content {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+  }
+  
+  .manage-services__header {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fafafa;
+  }
+  
+  .manage-services__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: #111827;
+  }
+  
+  .manage-services__description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+  }
+  
+  .manage-services__categories {
+    border: none;
+  }
+  
+  .manage-services__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 16rem;
+    background: white;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .manage-services__loading-text {
+    font-size: 1.125rem;
+    color: #6b7280;
+  }
+  
+  .manage-services__error {
+    padding: 1rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 0.5rem;
+    color: #dc2626;
+  }
+  
+  .manage-services__actions {
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+    background: #fafafa;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .manage-services__save-button {
+    padding: 0.5rem 1.5rem;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .manage-services__save-button:hover:not(:disabled) {
+    background-color: #1d4ed8;
+  }
+  
+  .manage-services__save-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .manage-services__summary {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #f0f9f0;
+    border: 1px solid #bbf7d0;
+    border-radius: 0.5rem;
+  }
+  
+  .manage-services__summary-title {
+    font-weight: 500;
+    color: #166534;
+    margin: 0 0 0.5rem 0;
+  }
+  
+  .manage-services__summary-text {
+    font-size: 0.875rem;
+    color: #15803d;
+    margin: 0;
+  }

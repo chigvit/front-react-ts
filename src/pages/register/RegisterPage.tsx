@@ -29,11 +29,11 @@ export const RegisterPage = () => {
     setStep('form');
   };
 
-  // ИСПРАВЛЕНО: Используем e.target.name вместо e.target.id
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value, // Изменено с e.target.id на e.target.name
+      [e.target.name]: e.target.value, 
     });
   };
 
@@ -45,7 +45,7 @@ export const RegisterPage = () => {
       return;
     }
 
-    // ИСПРАВЛЕНО: Формируем правильные данные для отправки
+
     const submitData = {
       first_name: formData.first_name,
       last_name: formData.last_name,

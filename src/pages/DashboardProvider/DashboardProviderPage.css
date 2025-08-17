@@ -1,0 +1,44 @@
+/* src/pages/DashboardProviderPage/DashboardProviderPage.css */
+
+.dashboard-provider-page {
+    min-height: 100vh;
+    background-color: #f9fafb;
+  }
+  
+  .dashboard-provider-page__main {
+    padding: 1rem;
+    max-width: 64rem;
+    margin: 0 auto;
+  }
+  
+  .dashboard-provider-page__header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .dashboard-provider-page__title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: #111827;
+  }
+  
+  .dashboard-provider-page__description {
+    color: #6b7280;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  @media (max-width: 768px) {
+    .dashboard-provider-page__main {
+      padding: 0.75rem;
+    }
+    
+    .dashboard-provider-page__title {
+      font-size: 1.5rem;
+    }
+    
+    .dashboard-provider-page__description {
+      font-size: 0.875rem;
+    }
+  }
