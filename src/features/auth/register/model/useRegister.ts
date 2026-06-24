@@ -10,8 +10,10 @@ export const useRegister = () => {
 
   return useMutation({
     mutationFn: (data: RegisterRequest) => userApi.register(data),
-    onSuccess: () => {
-      router.push('/login?registered=true')
+    onSuccess: (_, variables) => {
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      router.push(`/check-email?email=${encodeURIComponent(variables.email)}`)
     },
   })
 }

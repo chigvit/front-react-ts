@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/entities/user/model/userStore'
 import { userApi } from '@/entities/user/api/userApi'
+import { CreateOrderDropdown } from './CreateOrderDropdown'
 
 export const Header = () => {
   const { isAuthenticated, user, _hasHydrated, logout, refreshToken } = useAuthStore()
@@ -46,6 +47,7 @@ export const Header = () => {
 
         {/* Nav */}
         <nav className="hidden items-center gap-6 md:flex">
+          <CreateOrderDropdown />
           <Link href="/categories" className="text-sm text-gray-600 hover:text-orange-500">
             Категорії
           </Link>

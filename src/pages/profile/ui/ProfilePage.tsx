@@ -38,6 +38,15 @@ export const ProfilePage = () => {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
+      {/* Банер неактивованого email */}
+      {user && !user.isEmailVerified && (
+        <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+          <p className="text-sm font-medium text-yellow-800">
+            ⚠️ Ваш email не підтверджено. Перевірте пошту та перейдіть за посиланням з листа для активації акаунту.
+          </p>
+        </div>
+      )}
+
       {/* Header профілю */}
       <div className="mb-6 flex items-center gap-4">
         <div className="flex h-20 w-20 overflow-hidden rounded-full border border-gray-200">

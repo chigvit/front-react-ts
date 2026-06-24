@@ -21,6 +21,7 @@ export interface User {
   status: UserStatus
   isEmailVerified: boolean
   postcode?: string
+  languages?: string[]
 }
 
 export interface MasterProfileData {
@@ -29,6 +30,7 @@ export interface MasterProfileData {
   isVerified: boolean
   rating: number
   reviewsCount: number
+  radiusMiles?: number
 }
 
 export interface UserProfile extends User {

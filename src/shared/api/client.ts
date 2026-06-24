@@ -47,7 +47,11 @@ apiClient.interceptors.response.use(
       } catch {
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
-        window.location.href = '/login'
+        const authPages = ['/login', '/register', '/forgot-password', '/reset-password', '/check-email', '/verify-email']
+        const isAuthPage = authPages.some((p) => window.location.pathname.startsWith(p))
+        if (!isAuthPage) {
+          window.location.href = '/login'
+        }
       }
     }
 

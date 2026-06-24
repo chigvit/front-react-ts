@@ -9,7 +9,7 @@ import Link from 'next/link'
 export default function VerifyEmailPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const token = searchParams.get('token')
+  const token = searchParams?.get('token')
 
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
@@ -25,7 +25,7 @@ export default function VerifyEmailPage() {
       .then(() => {
         setStatus('success')
         setMessage('Email успішно підтверджено!')
-        setTimeout(() => router.push('/login'), 3000)
+        setTimeout(() => router.push('/login?verified=true'), 3000)
       })
       .catch(() => {
         setStatus('error')
@@ -48,7 +48,7 @@ export default function VerifyEmailPage() {
             <div className="mb-4 text-5xl">✅</div>
             <h1 className="mb-2 text-2xl font-bold text-gray-800">Готово!</h1>
             <p className="mb-4 text-gray-600">{message}</p>
-            <p className="text-sm text-gray-500">Перенаправлення на сторінку входу...</p>
+            <p className="text-sm text-gray-500">Переходимо на сторінку входу...</p>
           </>
         )}
 

@@ -8,11 +8,22 @@ import { Input } from '@/shared/ui/Input'
 import { useRegister } from '../model/useRegister'
 
 const schema = z.object({
-  email: z.string().email('Невірний формат email'),
-  password: z.string().min(8, 'Мінімум 8 символів'),
+  email: z
+    .string()
+    .min(1, 'Email обов\'язковий')
+    .email('Невірний формат email')
+    .refine((v) => v.includes('.'), 'Невірний формат email'),
+  password: z
+    .string()
+    .min(8, 'Мінімум 8 символів')
+    .regex(/[A-Z]/, 'Має містити хоча б одну велику літеру')
+    .regex(/[0-9]/, 'Має містити хоча б одну цифру'),
   firstName: z.string().min(2, 'Мінімум 2 символи'),
   lastName: z.string().min(2, 'Мінімум 2 символи'),
-  phone: z.string().optional(),
+  phone: z
+    .string()
+    .optional()
+    .refine((v) => !v || /^\+?[0-9]\d{6,14}$/.test(v), 'Невірний формат телефону'),
   userRole: z.enum(['USER_TYPE_CUSTOMER', 'USER_TYPE_MASTER']),
 })
 
@@ -23,6 +34,7 @@ export const RegisterForm = () => {
 
   const { register: formRegister, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
+    mode: 'onBlur',
     defaultValues: { userRole: 'USER_TYPE_CUSTOMER' },
   })
 
@@ -33,12 +45,14 @@ export const RegisterForm = () => {
       <div className="grid grid-cols-2 gap-4">
         <Input
           label="Ім'я"
+          autoComplete="given-name"
           placeholder="Іван"
           error={errors.firstName?.message}
           {...formRegister('firstName')}
         />
         <Input
           label="Прізвище"
+          autoComplete="family-name"
           placeholder="Іванченко"
           error={errors.lastName?.message}
           {...formRegister('lastName')}
@@ -48,6 +62,7 @@ export const RegisterForm = () => {
       <Input
         label="Email"
         type="email"
+        autoComplete="email"
         placeholder="your@email.com"
         error={errors.email?.message}
         {...formRegister('email')}
@@ -56,13 +71,16 @@ export const RegisterForm = () => {
       <Input
         label="Телефон"
         type="tel"
+        autoComplete="tel"
         placeholder="+380671234567"
+        error={errors.phone?.message}
         {...formRegister('phone')}
       />
 
       <Input
         label="Пароль"
         type="password"
+        autoComplete="new-password"
         placeholder="••••••••"
         error={errors.password?.message}
         {...formRegister('password')}
@@ -83,7 +101,11 @@ export const RegisterForm = () => {
       </div>
 
       {error && (
-        <p className="text-sm text-red-500">Помилка реєстрації. Спробуйте ще раз.</p>
+        <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+          <p className="text-sm text-red-600">
+            {(error as any)?.response?.data?.error || 'Помилка реєстрації. Спробуйте ще раз.'}
+          </p>
+        </div>
       )}
 
       <Button type="submit" loading={isPending} className="w-full">
