@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useAuthStore } from '@/entities/user/model/userStore'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
@@ -40,13 +41,22 @@ apiClient.interceptors.response.use(
         const { data } = await axios.post(`${API_URL}/api/v1/auth/refresh`, {
           refresh_token: refreshToken,
         })
+
+        // Оновлюємо localStorage і Zustand разом, щоб стан не розходився
         localStorage.setItem('access_token', data.access_token)
         localStorage.setItem('refresh_token', data.refresh_token)
+
+        const store = useAuthStore.getState()
+        if (store.user) {
+          store.setAuth(store.user, data.access_token, data.refresh_token)
+        }
+
         original.headers.Authorization = `Bearer ${data.access_token}`
         return apiClient(original)
       } catch {
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
+        // Refresh не вдався — повністю виходимо (очищаємо і localStorage і Zustand)
+        useAuthStore.getState().logout()
+
         const authPages = ['/login', '/register', '/forgot-password', '/reset-password', '/check-email', '/verify-email']
         const isAuthPage = authPages.some((p) => window.location.pathname.startsWith(p))
         if (!isAuthPage) {

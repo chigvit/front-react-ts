@@ -81,7 +81,7 @@ export const MastersMap = ({ masters, userLocation, radius }: MastersMapProps) =
           >
             <Popup>
               <div className="text-sm">
-                <p className="font-bold">{master.first_name} {master.last_name}</p>
+                <p className="font-bold">{master.first_name} {master.last_name?.[0]}.</p>
                 {master.rating > 0 && (
                   <p className="text-yellow-500">⭐ {master.rating} ({master.reviews_count})</p>
                 )}

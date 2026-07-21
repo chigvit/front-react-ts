@@ -6,20 +6,21 @@ import { useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import Link from 'next/link'
 import { apiClient } from '@/shared/api/client'
 import { useAuthStore } from '@/entities/user/model/userStore'
 import { userApi } from '@/entities/user/api/userApi'
-import { useGeolocation } from '@/shared/hooks/useGeolocation'
 import { Input } from '@/shared/ui/Input'
 import { Button } from '@/shared/ui/Button'
 import { Spinner } from '@/shared/ui/Spinner'
+import { MastersSidebar } from '@/widgets/masters-sidebar/ui/MastersSidebar'
 
 const orderSchema = z.object({
   title: z.string().min(5, 'Minimum 5 characters'),
   description: z.string().min(10, 'Minimum 10 characters'),
   address: z.string().min(3, 'Address is required'),
   budget: z.number().min(0).optional(),
+  scheduledAt: z.string().optional(),
+  scheduledTo: z.string().optional(),
 })
 
 const guestSchema = z.object({
@@ -38,14 +39,10 @@ type OrderFormData = z.infer<typeof orderSchema>
 type GuestFormData = z.infer<typeof guestSchema>
 type LoginFormData = z.infer<typeof loginSchema>
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
-
 export const CreateOrderPage = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { isAuthenticated, _hasHydrated, setAuth } = useAuthStore()
-  const { location } = useGeolocation()
-
   const workTypeId = searchParams?.get('work_type_id') ?? null
 
   const [selectedMasterId, setSelectedMasterId] = useState<string | null>(
@@ -74,25 +71,6 @@ export const CreateOrderPage = () => {
     enabled: !!workTypeId,
   })
 
-  const { data: mastersData, isLoading: mastersLoading } = useQuery({
-    queryKey: ['masters-for-order', workTypeId, location?.latitude, location?.longitude],
-    queryFn: async () => {
-      const lat = location?.latitude ?? 53.8008
-      const lng = location?.longitude ?? -1.5491
-      const res = await apiClient.get('/api/v1/location/masters', {
-        params: {
-          lat,
-          lng,
-          radius: 50000,
-          work_type_id: workTypeId ? parseInt(workTypeId) : undefined,
-        },
-      })
-      return res.data.masters ?? []
-    },
-  })
-
-  const masters: any[] = mastersData ?? []
-
   const orderForm = useForm<OrderFormData>({ resolver: zodResolver(orderSchema) })
   const guestForm = useForm<GuestFormData>({ resolver: zodResolver(guestSchema) })
   const loginForm = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) })
@@ -106,6 +84,8 @@ export const CreateOrderPage = () => {
       description: orderData.description,
       budget: orderData.budget ?? 0,
       address: orderData.address,
+      scheduled_at: orderData.scheduledAt || undefined,
+      scheduled_to: orderData.scheduledTo || undefined,
     })
     return res.data
   }
@@ -257,7 +237,7 @@ export const CreateOrderPage = () => {
             placeholder="000000"
             value={smsCode}
             onChange={(e) => { setSmsCode(e.target.value.replace(/\D/g, '')); setError(null) }}
-            className={`mb-2 w-full rounded-xl border px-4 py-3 text-center text-2xl font-bold tracking-widest focus:outline-none ${
+            className={`mb-2 w-full rounded-xl border px-4 py-3 text-center text-2xl font-bold tracking-widest text-gray-900 focus:outline-none ${
               error ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-orange-500'
             }`}
           />
@@ -366,6 +346,26 @@ export const CreateOrderPage = () => {
                 placeholder="0"
                 {...orderForm.register('budget', { valueAsNumber: true })}
               />
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Дата виконання — необов'язково
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="date"
+                    min={new Date().toISOString().slice(0, 10)}
+                    className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                    {...orderForm.register('scheduledAt')}
+                  />
+                  <span className="shrink-0 text-sm text-gray-400">—</span>
+                  <input
+                    type="date"
+                    min={new Date().toISOString().slice(0, 10)}
+                    className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                    {...orderForm.register('scheduledTo')}
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -458,94 +458,12 @@ export const CreateOrderPage = () => {
         </div>
 
         {/* Права колонка — список майстрів */}
-        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-          <div className="border-b border-gray-100 px-4 py-3">
-            <h2 className="font-semibold text-gray-800">
-              {workTypeData ? `Майстри — ${workTypeData.name}` : 'Доступні майстри'}
-            </h2>
-            <p className="mt-0.5 text-xs text-gray-400">
-              {masters.length > 0 ? `${masters.length} майстрів поруч` : 'Пошук майстрів...'}
-            </p>
-          </div>
-
-          <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
-            {mastersLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Spinner size="md" />
-              </div>
-            ) : masters.length === 0 ? (
-              <div className="px-4 py-12 text-center text-sm text-gray-400">
-                <p className="mb-1 text-3xl">🔍</p>
-                Майстрів не знайдено поруч
-              </div>
-            ) : (
-              <div className="divide-y divide-gray-100">
-                {masters.map((master: any) => {
-                  const isSelected = selectedMasterId === master.user_id
-                  return (
-                    <div
-                      key={master.user_id}
-                      className={`p-4 transition-colors ${isSelected ? 'bg-orange-50' : 'hover:bg-gray-50'}`}
-                    >
-                      {/* Аватар + ім'я */}
-                      <div className="mb-3 flex items-center gap-3">
-                        <div className="flex h-11 w-11 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-orange-100">
-                          {master.avatar_url ? (
-                            <img
-                              src={`${API_URL}${master.avatar_url}`}
-                              alt="Avatar"
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-sm font-bold text-orange-500">
-                              {master.first_name?.[0]}{master.last_name?.[0]}
-                            </div>
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="truncate font-medium text-gray-800">
-                            {master.first_name} {master.last_name}
-                          </p>
-                          <div className="flex items-center gap-2 text-xs text-gray-400">
-                            {master.rating > 0 && (
-                              <span className="text-yellow-500">⭐ {master.rating}</span>
-                            )}
-                            {master.distance_meters > 0 && (
-                              <span>📍 {(master.distance_meters / 1000).toFixed(1)} км</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Кнопки */}
-                      <div className="flex gap-2">
-                        <Link
-                          href={`/masters/${master.user_id}`}
-                          target="_blank"
-                          className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-center text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100"
-                        >
-                          Переглянути профіль
-                        </Link>
-                        <button
-                          onClick={() =>
-                            setSelectedMasterId(isSelected ? null : master.user_id)
-                          }
-                          className={`flex-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                            isSelected
-                              ? 'border border-orange-300 bg-orange-100 text-orange-700'
-                              : 'bg-orange-500 text-white hover:bg-orange-600'
-                          }`}
-                        >
-                          {isSelected ? '✓ Обрано' : 'Запропонувати роботу'}
-                        </button>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        </div>
+        <MastersSidebar
+          workTypeId={Number(workTypeId) || 0}
+          title={workTypeData ? `Майстри — ${workTypeData.name}` : 'Доступні майстри'}
+          selectedMasterId={selectedMasterId}
+          onSelectMaster={setSelectedMasterId}
+        />
       </div>
     </div>
   )

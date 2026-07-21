@@ -1,11 +1,11 @@
 export type OrderType = 'OPEN' | 'DIRECT'
 
-export type OrderStatus = 
-  | 'OPEN' 
-  | 'PENDING' 
-  | 'IN_PROGRESS' 
-  | 'COMPLETED' 
-  | 'CANCELLED' 
+export type OrderStatus =
+  | 'OPEN'
+  | 'PENDING'
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'CANCELLED'
   | 'REJECTED'
 
 export interface Order {
@@ -23,6 +23,7 @@ export interface Order {
   latitude?: number
   longitude?: number
   scheduledAt?: string
+  scheduledTo?: string
   completedAt?: string
   createdAt: string
   updatedAt: string
@@ -50,4 +51,15 @@ export interface CreateOrderRequest {
   longitude?: number
   radiusKm?: number
   scheduledAt?: string
+  scheduledTo?: string
+}
+
+export interface UpdateOrderRequest {
+  title: string
+  description?: string
+  budget: number
+  address?: string
+  scheduled_at?: string
+  scheduled_to?: string
+  work_type_id?: number
 }

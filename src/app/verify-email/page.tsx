@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { apiClient } from '@/shared/api/client'
+import { userApi } from '@/entities/user/api/userApi'
+import { useAuthStore } from '@/entities/user/model/userStore'
 import { Spinner } from '@/shared/ui/Spinner'
 import Link from 'next/link'
 
@@ -10,9 +12,11 @@ export default function VerifyEmailPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const token = searchParams?.get('token')
+  const { setUser } = useAuthStore()
 
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {
     if (!token) {
@@ -22,10 +26,26 @@ export default function VerifyEmailPage() {
     }
 
     apiClient.get(`/api/v1/auth/verify-email?token=${token}`)
-      .then(() => {
+      .then(async () => {
+        // Читаємо поточний стан store (не закешований з рендеру)
+        const currentToken = useAuthStore.getState().accessToken
+
+        if (currentToken) {
+          try {
+            const freshProfile = await userApi.getProfile()
+            setUser(freshProfile)
+            setIsLoggedIn(true)
+          } catch {
+            // тихо ігноруємо
+          }
+        }
+
         setStatus('success')
         setMessage('Email успішно підтверджено!')
-        setTimeout(() => router.push('/login?verified=true'), 3000)
+
+        setTimeout(() => {
+          router.push(currentToken ? '/profile' : '/login?verified=true')
+        }, 2000)
       })
       .catch(() => {
         setStatus('error')
@@ -48,7 +68,9 @@ export default function VerifyEmailPage() {
             <div className="mb-4 text-5xl">✅</div>
             <h1 className="mb-2 text-2xl font-bold text-gray-800">Готово!</h1>
             <p className="mb-4 text-gray-600">{message}</p>
-            <p className="text-sm text-gray-500">Переходимо на сторінку входу...</p>
+            <p className="text-sm text-gray-500">
+              {isLoggedIn ? 'Переходимо до профілю...' : 'Переходимо на сторінку входу...'}
+            </p>
           </>
         )}
 

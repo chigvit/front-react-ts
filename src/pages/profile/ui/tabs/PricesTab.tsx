@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { apiClient } from '@/shared/api/client'
 import { Button } from '@/shared/ui/Button'
@@ -25,43 +25,48 @@ interface PriceItem {
   currency: string
 }
 
+type Edits = Record<number, Partial<PriceItem>>
+
 export const PricesTab = () => {
-  const [items, setItems] = useState<PriceItem[]>([])
+  const [edits, setEdits] = useState<Edits>({})
   const [saved, setSaved] = useState(false)
 
-  // Завантажуємо вибрані типи робіт з цінами
   const { data: workTypesData, isLoading: loadingWorkTypes } = useQuery({
     queryKey: ['worker-work-types'],
     queryFn: async () => {
       const res = await apiClient.get('/api/v1/users/work-types')
       return res.data.items ?? []
     },
+    staleTime: 30_000,
   })
 
-  // Завантажуємо всі типи робіт щоб отримати назви
   const { data: allWorkTypes, isLoading: loadingAll } = useQuery({
     queryKey: ['all-work-types'],
     queryFn: async () => {
       const res = await apiClient.get('/api/v1/work-types')
       return res.data.work_types ?? []
     },
+    staleTime: Infinity,
   })
 
-  useEffect(() => {
-    if (workTypesData && allWorkTypes) {
-      const merged = workTypesData.map((wt: any) => {
-        const found = allWorkTypes.find((a: any) => a.id === wt.work_type_id)
-        return {
-          workTypeId: wt.work_type_id,
-          name: found?.name ?? `Work type #${wt.work_type_id}`,
-          price: wt.price ?? 0,
-          unit: wt.unit ?? 'per/hour',
-          currency: wt.currency ?? 'GBP',
-        }
-      })
-      setItems(merged)
-    }
+  const baseItems = useMemo<PriceItem[]>(() => {
+    if (!workTypesData || !allWorkTypes) return []
+    return workTypesData.map((wt: any) => {
+      const found = allWorkTypes.find((a: any) => a.id === wt.work_type_id)
+      return {
+        workTypeId: wt.work_type_id,
+        name: found?.name ?? `Work type #${wt.work_type_id}`,
+        price: wt.price ?? 0,
+        unit: wt.unit ?? 'per/hour',
+        currency: wt.currency ?? 'GBP',
+      }
+    })
   }, [workTypesData, allWorkTypes])
+
+  const items = useMemo(
+    () => baseItems.map(item => ({ ...item, ...(edits[item.workTypeId] ?? {}) })),
+    [baseItems, edits]
+  )
 
   const { mutate: savePrices, isPending } = useMutation({
     mutationFn: async () => {
@@ -81,11 +86,10 @@ export const PricesTab = () => {
   })
 
   const updateItem = (workTypeId: number, field: keyof PriceItem, value: any) => {
-    setItems(prev =>
-      prev.map(item =>
-        item.workTypeId === workTypeId ? { ...item, [field]: value } : item
-      )
-    )
+    setEdits(prev => ({
+      ...prev,
+      [workTypeId]: { ...(prev[workTypeId] ?? {}), [field]: value },
+    }))
   }
 
   if (loadingWorkTypes || loadingAll) {
@@ -139,11 +143,16 @@ export const PricesTab = () => {
 
               <div className="col-span-3">
                 <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={item.price}
-                  onChange={(e) => updateItem(item.workTypeId, 'price', parseFloat(e.target.value) || 0)}
+                  type="text"
+                  inputMode="decimal"
+                  value={item.price || ''}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(',', '.')
+                    if (v === '' || /^\d*\.?\d*$/.test(v)) {
+                      updateItem(item.workTypeId, 'price', parseFloat(v) || 0)
+                    }
+                  }}
+                  placeholder="0"
                   className="w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                 />
               </div>

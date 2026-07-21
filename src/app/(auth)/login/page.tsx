@@ -10,14 +10,14 @@ import { useAuthStore } from '@/entities/user/model/userStore'
 function LoginContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, _hasHydrated } = useAuthStore()
   const verified = searchParams?.get('verified') === 'true'
 
   useEffect(() => {
-    if (isAuthenticated()) {
+    if (_hasHydrated && isAuthenticated()) {
       router.replace(verified ? '/profile' : '/')
     }
-  }, [])
+  }, [_hasHydrated])
 
   return (
     <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-gray-50 px-4 py-12">

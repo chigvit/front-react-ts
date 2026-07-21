@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/api/client'
-import { Order, OrderResponse, CreateOrderRequest } from '../model/types'
+import { Order, OrderResponse, CreateOrderRequest, UpdateOrderRequest } from '../model/types'
 
 export const orderApi = {
   create: async (data: CreateOrderRequest): Promise<{ order: Order }> => {
@@ -29,6 +29,11 @@ export const orderApi = {
     radius?: number
   }): Promise<{ orders: Order[] }> => {
     const res = await apiClient.get('/api/v1/orders', { params })
+    return res.data
+  },
+
+  update: async (id: string, data: UpdateOrderRequest): Promise<{ order: Order }> => {
+    const res = await apiClient.put(`/api/v1/orders/${id}`, data)
     return res.data
   },
 

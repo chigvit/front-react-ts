@@ -177,7 +177,7 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
                           <div className="flex items-start justify-between">
                             <div>
                               <h3 className="text-lg font-semibold text-gray-800">
-                                {master.first_name} {master.last_name}
+                                {master.first_name} {master.last_name?.[0]}.
                               </h3>
                               {master.postcode && (
                                 <p className="text-sm text-gray-500">

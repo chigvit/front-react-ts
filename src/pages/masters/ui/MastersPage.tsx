@@ -123,7 +123,7 @@ export const MastersPage = () => {
                   </div>
                   <div>
                     <p className="font-medium text-gray-800">
-                      {master.first_name} {master.last_name}
+                      {master.first_name} {master.last_name?.[0]}.
                     </p>
                     {master.rating > 0 && (
                       <p className="text-sm text-yellow-500">
@@ -166,7 +166,7 @@ export const MastersPage = () => {
                   </div>
                   <div>
                     <p className="font-medium text-gray-800">
-                      {master.first_name} {master.last_name}
+                      {master.first_name} {master.last_name?.[0]}.
                     </p>
                     {master.rating > 0 && (
                       <p className="text-sm text-yellow-500">⭐ {master.rating}</p>

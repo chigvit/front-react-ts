@@ -1,6 +1,8 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/entities/user/model/userStore'
+import { userApi } from '@/entities/user/api/userApi'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { GeneralTab } from './tabs/GeneralTab'
 import { WorkTypesTab } from './tabs/WorkTypesTab'
@@ -13,10 +15,19 @@ type Tab = 'general' | 'work-types' | 'prices' | 'password'
 export const ProfilePage = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { user, isAuthenticated } = useAuthStore()
+  const { user, isAuthenticated, setUser } = useAuthStore()
 
-  const activeTab = (searchParams.get('tab') as Tab) ?? 'general'
   const isMaster = user?.role === 'USER_TYPE_MASTER'
+  const [activeTab, setActiveTabState] = useState<Tab>(
+    (searchParams.get('tab') as Tab) ?? 'general'
+  )
+
+  // Якщо email ще не підтверджений у store — тихо перевіряємо свіжий стан з API
+  useEffect(() => {
+    if (!user?.isEmailVerified) {
+      userApi.getProfile().then(setUser).catch(() => {})
+    }
+  }, [])
 
   if (!isAuthenticated()) {
     router.push('/login')
@@ -33,7 +44,8 @@ export const ProfilePage = () => {
   ]
 
   const setActiveTab = (tab: Tab) => {
-    router.replace(`/profile?tab=${tab}`, { scroll: false })
+    setActiveTabState(tab)
+    window.history.replaceState(null, '', `/profile?tab=${tab}`)
   }
 
   return (
@@ -64,7 +76,7 @@ export const ProfilePage = () => {
         </div>
         <div>
           <h1 className="text-xl font-bold text-gray-800">
-            {user?.firstName} {user?.lastName}
+            {user?.firstName} {user?.lastName?.[0]}.
           </h1>
           <p className="text-sm text-gray-500">{user?.email}</p>
           <p className="text-xs text-gray-400">
@@ -94,10 +106,14 @@ export const ProfilePage = () => {
 
       {/* Контент вкладки */}
       <div>
-        {activeTab === 'general' && <GeneralTab />}
-        {activeTab === 'work-types' && isMaster && <WorkTypesTab />}
-        {activeTab === 'prices' && isMaster && <PricesTab />}
-        {activeTab === 'password' && <ChangePasswordTab />}
+        <div className={activeTab !== 'general' ? 'hidden' : ''}><GeneralTab /></div>
+        {isMaster && (
+          <>
+            <div className={activeTab !== 'work-types' ? 'hidden' : ''}><WorkTypesTab /></div>
+            <div className={activeTab !== 'prices' ? 'hidden' : ''}><PricesTab /></div>
+          </>
+        )}
+        <div className={activeTab !== 'password' ? 'hidden' : ''}><ChangePasswordTab /></div>
       </div>
 
       {/* Вийти */}
