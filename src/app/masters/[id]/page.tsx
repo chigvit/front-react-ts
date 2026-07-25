@@ -1,4 +1,4 @@
-import { MasterProfilePage } from '@/pages/masters/ui/MasterProfilePage'
+import { MasterProfilePage } from '@/views/masters/ui/MasterProfilePage'
 
 interface Props {
   params: Promise<{ id: string }>

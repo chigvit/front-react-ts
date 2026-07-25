@@ -1,5 +1,10 @@
-import { ProfilePage } from '@/pages/profile/ui/ProfilePage'
+import { Suspense } from 'react'
+import { ProfilePage } from '@/views/profile/ui/ProfilePage'
 
 export default function Profile() {
-  return <ProfilePage />
+  return (
+    <Suspense fallback={null}>
+      <ProfilePage />
+    </Suspense>
+  )
 }

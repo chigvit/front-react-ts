@@ -1,4 +1,4 @@
-import { IncomingOrdersPage } from '@/pages/orders/ui/IncomingOrdersPage'
+import { IncomingOrdersPage } from '@/views/orders/ui/IncomingOrdersPage'
 
 export default function Page() {
   return <IncomingOrdersPage />

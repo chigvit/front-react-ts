@@ -1,4 +1,4 @@
-import { EditOrderPage } from '@/pages/orders/ui/EditOrderPage'
+import { EditOrderPage } from '@/views/orders/ui/EditOrderPage'
 
 interface Props {
   params: Promise<{ id: string }>

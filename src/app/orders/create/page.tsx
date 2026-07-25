@@ -1,5 +1,10 @@
-import { CreateOrderPage } from '@/pages/orders/ui/CreateOrderPage'
+import { Suspense } from 'react'
+import { CreateOrderPage } from '@/views/orders/ui/CreateOrderPage'
 
 export default function CreateOrder() {
-  return <CreateOrderPage />
+  return (
+    <Suspense fallback={null}>
+      <CreateOrderPage />
+    </Suspense>
+  )
 }
