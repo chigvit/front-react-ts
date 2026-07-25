@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/shared/api/client'
 import { getLastRead } from '@/shared/lib/unreadMessages'
@@ -8,7 +8,10 @@ export function useUnreadMessages(
   orders: any[],
   myRole: 'customer' | 'master',
 ) {
-  const setUnread = useUnreadStore((s) => s.setUnread)
+  const addUnread = useUnreadStore((s) => s.addUnread)
+  const removeUnread = useUnreadStore((s) => s.removeUnread)
+  // Відстежуємо які ID цей хук додав — щоб не чіпати ID від інших джерел (нові замовлення)
+  const ownUnread = useRef<Set<string>>(new Set())
 
   const activeIds = orders
     .filter(
@@ -37,16 +40,26 @@ export function useUnreadMessages(
 
   useEffect(() => {
     if (!data) return
-    const unread = new Set<string>()
+    const nowUnread = new Set<string>()
     for (const { id, messages } of data) {
       if (messages.length === 0) continue
       const last = messages[messages.length - 1]
       const msgTime = new Date(last.created_at).getTime()
       const lastRead = getLastRead(id)
       if (last.role !== myRole && msgTime > lastRead) {
-        unread.add(id)
+        nowUnread.add(id)
       }
     }
-    setUnread(unread)
-  }, [data, myRole, setUnread])
+
+    // Додаємо нові непрочитані повідомлення
+    for (const id of nowUnread) {
+      if (!ownUnread.current.has(id)) addUnread(id)
+    }
+    // Знімаємо підсвітку тільки для тих, які цей хук сам додав і тепер прочитані
+    for (const id of ownUnread.current) {
+      if (!nowUnread.has(id)) removeUnread(id)
+    }
+
+    ownUnread.current = nowUnread
+  }, [data, myRole, addUnread, removeUnread])
 }

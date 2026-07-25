@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -12,6 +12,7 @@ import { OrderChat } from '@/widgets/order-chat/ui/OrderChat'
 import { useUnreadMessages } from '@/shared/hooks/useUnreadMessages'
 import { useUnreadStore } from '@/shared/model/unreadStore'
 import { markAsRead } from '@/shared/lib/unreadMessages'
+import { getSeenOrderIds, markOrderSeen } from '@/shared/lib/seenOrders'
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'info' }> = {
   PENDING:     { label: 'Очікує відповіді', variant: 'warning' },
@@ -81,6 +82,18 @@ export const IncomingOrdersPage = () => {
   useUnreadMessages(ordersData ?? [], 'master')
   const unreadOrderIds = useUnreadStore((s) => s.unreadOrderIds)
   const removeUnread = useUnreadStore((s) => s.removeUnread)
+  const addUnread = useUnreadStore((s) => s.addUnread)
+
+  // Нові вхідні замовлення (ще не переглянуті) → підсвічуємо як непрочитані
+  useEffect(() => {
+    if (!ordersData) return
+    const seen = getSeenOrderIds()
+    for (const order of ordersData) {
+      if (!seen.has(order.id)) {
+        addUnread(order.id)
+      }
+    }
+  }, [ordersData, addUnread])
 
   const shareContactMutation = useMutation({
     mutationFn: (orderId: string) => apiClient.post(`/api/v1/orders/${orderId}/share-contact`),
@@ -94,6 +107,11 @@ export const IncomingOrdersPage = () => {
 
   const rejectMutation = useMutation({
     mutationFn: (orderId: string) => apiClient.post(`/api/v1/orders/${orderId}/reject`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['incoming-orders'] }),
+  })
+
+  const completeMutation = useMutation({
+    mutationFn: (orderId: string) => apiClient.post(`/api/v1/orders/${orderId}/complete`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['incoming-orders'] }),
   })
 
@@ -195,6 +213,7 @@ export const IncomingOrdersPage = () => {
                       onClick={() => {
                         if (!isExpanded) {
                           markAsRead(order.id)
+                          markOrderSeen(order.id)
                           removeUnread(order.id)
                         }
                         setExpandedId(isExpanded ? null : order.id)
@@ -272,6 +291,7 @@ export const IncomingOrdersPage = () => {
                     {/* Контактні дані замовника якщо він поділився */}
                     {isInProgress && (
                       <div className="mt-4 border-t border-gray-100 pt-4">
+                        <p className="mb-3 text-sm font-medium text-green-600">✅ Вас прийняли до виконання</p>
                         {order.customer_phone ? (
                           <div className="mb-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3">
                             <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-green-600">Контакти замовника</p>
@@ -317,6 +337,19 @@ export const IncomingOrdersPage = () => {
                           className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
                         >
                           {rejectMutation.isPending ? 'Відхиляємо...' : 'Відхилити'}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Кнопка Виконано для майстра */}
+                    {isInProgress && (
+                      <div className="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-4">
+                        <button
+                          onClick={() => completeMutation.mutate(order.id)}
+                          disabled={completeMutation.isPending}
+                          className="rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 transition-colors disabled:opacity-50"
+                        >
+                          {completeMutation.isPending ? 'Завершуємо...' : '✅ Виконано'}
                         </button>
                       </div>
                     )}

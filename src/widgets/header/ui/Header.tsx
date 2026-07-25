@@ -53,6 +53,11 @@ export const Header = () => {
           <Link href="/categories" className="text-sm text-gray-600 hover:text-orange-500">
             Категорії
           </Link>
+          {isMaster && (
+            <Link href="/orders/search" className="text-sm text-gray-600 hover:text-orange-500">
+              Пошук замовлень
+            </Link>
+          )}
           <Link href="/masters" className="text-sm text-gray-600 hover:text-orange-500">
             Майстри
           </Link>
@@ -132,6 +137,16 @@ export const Header = () => {
                             {unreadCount > 9 ? '9+' : unreadCount}
                           </span>
                         )}
+                      </Link>
+                    )}
+
+                    {isMaster && (
+                      <Link
+                        href="/orders/search"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
+                      >
+                        🔍 Пошук замовлень
                       </Link>
                     )}
 

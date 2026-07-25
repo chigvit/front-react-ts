@@ -7,17 +7,20 @@ import { apiClient } from '@/shared/api/client'
 interface Props {
   orderId: string
   myRole: 'customer' | 'master'
+  masterId?: string
 }
 
-export const OrderChat = ({ orderId, myRole }: Props) => {
+export const OrderChat = ({ orderId, myRole, masterId }: Props) => {
   const queryClient = useQueryClient()
   const [text, setText] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const { data: messagesData } = useQuery({
-    queryKey: ['order-messages', orderId],
+    queryKey: ['order-messages', orderId, masterId ?? null],
     queryFn: async () => {
-      const res = await apiClient.get(`/api/v1/orders/${orderId}/messages`)
+      const res = await apiClient.get(`/api/v1/orders/${orderId}/messages`, {
+        params: masterId ? { master_id: masterId } : undefined,
+      })
       return res.data.messages ?? []
     },
     refetchInterval: 10_000,
@@ -31,10 +34,13 @@ export const OrderChat = ({ orderId, myRole }: Props) => {
 
   const sendMutation = useMutation({
     mutationFn: (text: string) =>
-      apiClient.post(`/api/v1/orders/${orderId}/messages`, { text }),
+      apiClient.post(`/api/v1/orders/${orderId}/messages`, {
+        text,
+        ...(masterId ? { master_id: masterId } : {}),
+      }),
     onSuccess: () => {
       setText('')
-      queryClient.invalidateQueries({ queryKey: ['order-messages', orderId] })
+      queryClient.invalidateQueries({ queryKey: ['order-messages', orderId, masterId ?? null] })
     },
   })
 

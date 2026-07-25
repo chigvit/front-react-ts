@@ -17,9 +17,11 @@ interface Props {
   // MyOrdersPage: пропонуємо існуюче замовлення
   proposableOrderId?: string | null
   onProposed?: () => void
+  // Приховати кнопку "Запропонувати" (замовлення не в статусі OPEN)
+  hidePropose?: boolean
 }
 
-export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMaster, proposableOrderId, onProposed }: Props) {
+export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMaster, proposableOrderId, onProposed, hidePropose }: Props) {
   const [expandedMasterId, setExpandedMasterId] = useState<string | null>(null)
   const [proposedMasterIds, setProposedMasterIds] = useState<Set<string>>(new Set())
 
@@ -196,7 +198,7 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
                           Запропонувати
                         </button>
                       )
-                    ) : (
+                    ) : !hidePropose ? (
                       // MyOrdersPage без розгорнутого замовлення: перейти до створення
                       <Link
                         href={`/orders/create?work_type_id=${workTypeId}&master_id=${master.user_id}`}
@@ -204,7 +206,7 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
                       >
                         Запропонувати
                       </Link>
-                    )}
+                    ) : null}
                     <Link
                       href={`/messages/${master.user_id}`}
                       className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-center text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors"

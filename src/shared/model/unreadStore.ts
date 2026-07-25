@@ -3,6 +3,7 @@ import { create } from 'zustand'
 interface UnreadStore {
   unreadOrderIds: Set<string>
   setUnread: (ids: Set<string>) => void
+  addUnread: (orderId: string) => void
   removeUnread: (orderId: string) => void
   clearUnread: () => void
 }
@@ -10,6 +11,11 @@ interface UnreadStore {
 export const useUnreadStore = create<UnreadStore>((set, get) => ({
   unreadOrderIds: new Set(),
   setUnread: (ids) => set({ unreadOrderIds: new Set(ids) }),
+  addUnread: (orderId) => {
+    const next = new Set(get().unreadOrderIds)
+    next.add(orderId)
+    set({ unreadOrderIds: next })
+  },
   removeUnread: (orderId) => {
     const next = new Set(get().unreadOrderIds)
     next.delete(orderId)

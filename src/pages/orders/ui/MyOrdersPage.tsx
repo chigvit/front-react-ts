@@ -29,6 +29,8 @@ export const MyOrdersPage = () => {
   const queryClient = useQueryClient()
   const { isAuthenticated, _hasHydrated } = useAuthStore()
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [responseError, setResponseError] = useState<string | null>(null)
+  const [openReplyResponseId, setOpenReplyResponseId] = useState<string | null>(null)
 
   const { data: ordersData, isLoading } = useQuery({
     queryKey: ['my-orders'],
@@ -53,14 +55,26 @@ export const MyOrdersPage = () => {
     workTypeMap[wt.id] = wt.name
   }
 
+  const { data: responsesData, isLoading: responsesLoading } = useQuery({
+    queryKey: ['order-responses', expandedId],
+    queryFn: async () => {
+      const res = await apiClient.get(`/api/v1/orders/${expandedId}/responses`)
+      return res.data.responses ?? []
+    },
+    enabled: !!expandedId && _hasHydrated && isAuthenticated(),
+  })
+
   const masterIds = useMemo<string[]>(() => {
     if (!ordersData) return []
     const ids = new Set<string>()
     for (const o of ordersData) {
       if (o.master_id) ids.add(o.master_id)
     }
+    for (const r of responsesData ?? []) {
+      if (r.master_id) ids.add(r.master_id)
+    }
     return [...ids]
-  }, [ordersData])
+  }, [ordersData, responsesData])
 
   const { data: mastersData } = useQuery({
     queryKey: ['master-profiles', masterIds],
@@ -98,6 +112,24 @@ export const MyOrdersPage = () => {
     },
   })
 
+  const completeMutation = useMutation({
+    mutationFn: (orderId: string) => apiClient.post(`/api/v1/orders/${orderId}/complete`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['my-orders'] }),
+  })
+
+  const acceptResponseMutation = useMutation({
+    mutationFn: ({ orderId, responseId }: { orderId: string; responseId: string }) =>
+      apiClient.post(`/api/v1/orders/${orderId}/responses/${responseId}/accept`),
+    onSuccess: (_data, { orderId }) => {
+      setResponseError(null)
+      queryClient.invalidateQueries({ queryKey: ['my-orders'] })
+      queryClient.invalidateQueries({ queryKey: ['order-responses', orderId] })
+    },
+    onError: (error: any) => {
+      setResponseError(error?.response?.data?.error ?? 'Не вдалося прийняти відгук')
+    },
+  })
+
   if (_hasHydrated && !isAuthenticated()) {
     router.push('/login')
     return null
@@ -114,8 +146,9 @@ export const MyOrdersPage = () => {
   const expandedOrder = ordersData?.find((o: any) => o.id === expandedId) ?? null
   const firstOrder = ordersData?.[0] ?? null
   const sidebarWorkTypeId = (expandedOrder ?? firstOrder)?.work_type_id ?? 0
-  // Можна запропонувати майстру тільки якщо розгорнуте OPEN замовлення
   const proposableOrderId = expandedOrder?.status === 'OPEN' ? expandedOrder.id : null
+  // Якщо розгорнуто замовлення не в статусі OPEN — ховаємо кнопку "Запропонувати"
+  const hidePropose = expandedOrder != null && expandedOrder.status !== 'OPEN'
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -278,6 +311,103 @@ export const MyOrdersPage = () => {
                         )}
                       </div>
 
+                      {/* Відгуки майстрів — доки замовлення відкрите й виконавця ще не обрано */}
+                      {order.status === 'OPEN' && (
+                        <div className="mt-4 border-t border-gray-100 pt-4">
+                          <h3 className="mb-3 text-sm font-semibold text-gray-800">
+                            Відгуки майстрів
+                            {responsesData?.length > 0 && (
+                              <span className="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-600">
+                                {responsesData.length}
+                              </span>
+                            )}
+                          </h3>
+
+                          {responsesLoading ? (
+                            <div className="flex justify-center py-4">
+                              <Spinner size="md" />
+                            </div>
+                          ) : !responsesData || responsesData.length === 0 ? (
+                            <p className="text-sm text-gray-400">Поки що немає відгуків від майстрів</p>
+                          ) : (
+                            <div className="flex flex-col gap-2">
+                              {responsesData.map((resp: any) => {
+                                const master = masterMap[resp.master_id]
+                                const displayName = master
+                                  ? `${master.first_name} ${master.last_name?.[0] ?? ''}.`
+                                  : null
+                                return (
+                                  <div
+                                    key={resp.id}
+                                    className={`rounded-lg border p-3 ${resp.is_accepted ? 'border-green-300 bg-green-50' : 'border-gray-200'}`}
+                                  >
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div className="flex-1">
+                                        <Link
+                                          href={`/masters/${resp.master_id}`}
+                                          className="flex items-center gap-2 w-fit"
+                                        >
+                                          {master?.avatar_url ? (
+                                            <img
+                                              src={`${API_URL}${master.avatar_url}`}
+                                              alt=""
+                                              className="h-6 w-6 rounded-full object-cover"
+                                            />
+                                          ) : (
+                                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-xs font-bold text-orange-500">
+                                              {master?.first_name?.[0] ?? '?'}
+                                            </div>
+                                          )}
+                                          <span className="text-sm font-medium text-gray-700 hover:underline">
+                                            {displayName ?? 'Майстер'}
+                                          </span>
+                                          {resp.is_accepted && <Badge variant="success">✓ Прийнято</Badge>}
+                                        </Link>
+                                        {resp.message && (
+                                          <p className="mt-1 text-sm text-gray-600">{resp.message}</p>
+                                        )}
+                                        {resp.price > 0 && (
+                                          <p className="mt-1 text-sm font-medium text-gray-700">£{resp.price}</p>
+                                        )}
+                                      </div>
+
+                                      <div className="flex shrink-0 flex-col items-end gap-2">
+                                        {!resp.is_accepted && (
+                                          <button
+                                            onClick={() => acceptResponseMutation.mutate({ orderId: order.id, responseId: resp.id })}
+                                            disabled={acceptResponseMutation.isPending}
+                                            className="rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-600 transition-colors disabled:opacity-50"
+                                          >
+                                            Прийняти
+                                          </button>
+                                        )}
+                                        <button
+                                          onClick={() => setOpenReplyResponseId(
+                                            openReplyResponseId === resp.id ? null : resp.id
+                                          )}
+                                          className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                                        >
+                                          {openReplyResponseId === resp.id ? 'Згорнути' : 'Відповісти'}
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    {openReplyResponseId === resp.id && (
+                                      <div className="mt-3 border-t border-gray-100 pt-3">
+                                        <OrderChat orderId={order.id} myRole="customer" masterId={resp.master_id} />
+                                      </div>
+                                    )}
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )}
+                          {responseError && (
+                            <p className="mt-2 text-sm text-red-500">{responseError}</p>
+                          )}
+                        </div>
+                      )}
+
                       {/* Контактні дані виконавця якщо він поділився */}
                       {order.master_id && order.status === 'IN_PROGRESS' && (
                         <div className="mt-4 border-t border-gray-100 pt-4">
@@ -319,6 +449,15 @@ export const MyOrdersPage = () => {
                             Редагувати
                           </Link>
                         )}
+                        {order.status === 'IN_PROGRESS' && (
+                          <button
+                            onClick={() => completeMutation.mutate(order.id)}
+                            disabled={completeMutation.isPending}
+                            className="rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 transition-colors disabled:opacity-50"
+                          >
+                            {completeMutation.isPending ? 'Завершуємо...' : '✅ Виконано'}
+                          </button>
+                        )}
                         {(order.status === 'OPEN' || order.status === 'PENDING') && (
                           <button
                             onClick={() => cancelMutation.mutate(order.id)}
@@ -341,6 +480,7 @@ export const MyOrdersPage = () => {
             <MastersSidebar
               workTypeId={sidebarWorkTypeId}
               proposableOrderId={proposableOrderId}
+              hidePropose={hidePropose}
               onProposed={() => queryClient.invalidateQueries({ queryKey: ['my-orders'] })}
             />
           </div>
