@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -31,10 +32,13 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export const OrderSearchPage = () => {
   const queryClient = useQueryClient()
+  const searchParams = useSearchParams()
   const { isAuthenticated, _hasHydrated, user, setAuth } = useAuthStore()
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
-  const [selectedWorkType, setSelectedWorkType] = useState<number>(0)
+  const [selectedWorkType, setSelectedWorkType] = useState<number>(
+    Number(searchParams?.get('work_type_id')) || 0
+  )
   // orderId → { message, price }
   const [responseForm, setResponseForm] = useState<Record<string, { message: string; price: string }>>({})
   const [responseError, setResponseError] = useState<Record<string, string>>({})

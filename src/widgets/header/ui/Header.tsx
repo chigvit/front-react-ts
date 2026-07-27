@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/entities/user/model/userStore'
 import { userApi } from '@/entities/user/api/userApi'
 import { CreateOrderDropdown } from './CreateOrderDropdown'
+import { SearchOrdersDropdown } from './SearchOrdersDropdown'
 import { useUnreadStore } from '@/shared/model/unreadStore'
 
 export const Header = () => {
@@ -53,9 +54,7 @@ export const Header = () => {
           <Link href="/categories" className="text-sm text-gray-600 hover:text-orange-500">
             Категорії
           </Link>
-          <Link href="/orders/search" className="text-sm text-gray-600 hover:text-orange-500">
-            Пошук замовлень
-          </Link>
+          <SearchOrdersDropdown />
           <Link href="/masters" className="text-sm text-gray-600 hover:text-orange-500">
             Майстри
           </Link>
