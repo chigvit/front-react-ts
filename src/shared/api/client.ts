@@ -20,6 +20,27 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
+// Бекенд видає одноразовий (ротаційний) refresh-токен: кожне оновлення анулює
+// попередній. Якщо кілька запитів одночасно ловлять 401 (звичайна ситуація —
+// React Query часто робить паралельні запити), кожен з них НЕ повинен окремо
+// смикати /auth/refresh старим токеном — лише перший встигне, решта отримають
+// "token already used" і розлогінять користувача попри жива сесію. Тому всі
+// паралельні 401 чекають один спільний запит на оновлення.
+let refreshPromise: Promise<{ access_token: string; refresh_token: string }> | null = null
+
+function refreshTokens() {
+  if (!refreshPromise) {
+    const refreshToken = localStorage.getItem('refresh_token')
+    refreshPromise = axios
+      .post(`${API_URL}/api/v1/auth/refresh`, { refresh_token: refreshToken })
+      .then((res) => res.data)
+      .finally(() => {
+        refreshPromise = null
+      })
+  }
+  return refreshPromise
+}
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -37,10 +58,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true
       try {
-        const refreshToken = localStorage.getItem('refresh_token')
-        const { data } = await axios.post(`${API_URL}/api/v1/auth/refresh`, {
-          refresh_token: refreshToken,
-        })
+        const data = await refreshTokens()
 
         // Оновлюємо localStorage і Zustand разом, щоб стан не розходився
         localStorage.setItem('access_token', data.access_token)
