@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { apiClient } from '@/shared/api/client'
 import { Spinner } from '@/shared/ui/Spinner'
 import { useGeolocation } from '@/shared/hooks/useGeolocation'
+import { MasterProfileContent } from '@/views/masters/ui/MasterProfileContent'
 
 interface CategoryPageProps {
   id: number
@@ -17,6 +18,7 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
   const selectedWorkTypeId = searchParams.get('work_type')
   const { location } = useGeolocation()
   const [radius, setRadius] = useState(50)
+  const [expandedMasterId, setExpandedMasterId] = useState<string | null>(null)
 
   const { data: categoryData, isLoading: loadingCategory } = useQuery({
     queryKey: ['category', id],
@@ -151,7 +153,9 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
-                  {mastersData?.map((master: any) => (
+                  {mastersData?.map((master: any) => {
+                    const isExpanded = expandedMasterId === master.user_id
+                    return (
                     <div
                       key={master.user_id}
                       className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
@@ -207,12 +211,12 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
                           )}
 
                           <div className="mt-3 flex gap-2">
-                            <Link
-                              href={`/masters/${master.user_id}`}
+                            <button
+                              onClick={() => setExpandedMasterId(isExpanded ? null : master.user_id)}
                               className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                             >
-                              View Profile
-                            </Link>
+                              {isExpanded ? 'Hide Profile' : 'View Profile'}
+                            </button>
                             <Link
                               href={`/orders/create?master_id=${master.user_id}&work_type_id=${selectedWorkTypeId}`}
                               className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors"
@@ -222,8 +226,15 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
                           </div>
                         </div>
                       </div>
+
+                      {isExpanded && (
+                        <div className="mt-5 border-t border-gray-100 pt-5">
+                          <MasterProfileContent masterId={master.user_id} />
+                        </div>
+                      )}
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </>
