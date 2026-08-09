@@ -206,7 +206,7 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
                             </div>
                           </div>
 
-                          {master.bio && (
+                          {master.bio && !isExpanded && (
                             <p className="mt-2 text-sm text-gray-600 line-clamp-2">{master.bio}</p>
                           )}
 
@@ -229,7 +229,7 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
 
                       {isExpanded && (
                         <div className="mt-5 border-t border-gray-100 pt-5">
-                          <MasterProfileContent masterId={master.user_id} />
+                          <MasterProfileContent masterId={master.user_id} showHero={false} />
                         </div>
                       )}
                     </div>

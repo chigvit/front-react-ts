@@ -10,6 +10,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
 interface Props {
   masterId: string
+  // Ховати "Hero"-блок (аватар/ім'я/локація/рейтинг) — коли контент
+  // вставляється inline під карткою майстра, яка вже показує ці самі дані,
+  // щоб не дублювати їх.
+  showHero?: boolean
 }
 
 function StarRating({ value, max = 5 }: { value: number; max?: number }) {
@@ -41,7 +45,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 // Повний вміст профілю майстра — без шапки сторінки (фон/"Назад"), щоб можна
 // було вставляти і як окрему сторінку (/masters/[id]), і inline (розгортання
 // картки майстра в списку, без переходу на іншу сторінку).
-export const MasterProfileContent = ({ masterId }: Props) => {
+export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
   const [ordersOpen, setOrdersOpen] = useState(false)
 
   const { data: profile, isLoading: profileLoading } = useQuery({
@@ -113,69 +117,71 @@ export const MasterProfileContent = ({ masterId }: Props) => {
   return (
     <>
       {/* ── Hero ── */}
-      <div className="mb-4 rounded-2xl bg-white p-5 shadow-sm">
-        <div className="flex gap-5">
-          {/* Avatar */}
-          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-gray-100 bg-orange-100 sm:h-24 sm:w-24">
-            {profile.avatar_url ? (
-              <img
-                src={`${API_URL}${profile.avatar_url}`}
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-2xl font-bold text-orange-500">
-                {profile.first_name?.[0]}{profile.last_name?.[0]}
-              </div>
-            )}
-          </div>
-
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-xl font-bold text-gray-900">
-                {profile.first_name} {profile.last_name?.[0]}.
-              </h1>
-              {mp?.is_verified && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-green-200">
-                  ✓ Верифіковано
-                </span>
+      {showHero && (
+        <div className="mb-4 rounded-2xl bg-white p-5 shadow-sm">
+          <div className="flex gap-5">
+            {/* Avatar */}
+            <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-gray-100 bg-orange-100 sm:h-24 sm:w-24">
+              {profile.avatar_url ? (
+                <img
+                  src={`${API_URL}${profile.avatar_url}`}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-2xl font-bold text-orange-500">
+                  {profile.first_name?.[0]}{profile.last_name?.[0]}
+                </div>
               )}
             </div>
 
-            {/* Location / experience */}
-            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
-              {profile.postcode && <span>📍 {profile.postcode}</span>}
-              {mp?.experience_years > 0 && (
-                <span>🛠 {mp.experience_years} р. досвіду</span>
-              )}
-              {mp?.radius_miles > 0 && <span>🚗 до {mp.radius_miles} миль</span>}
-            </div>
-
-            {/* Rating row */}
-            {(avgRating > 0 || ratings.length > 0) && (
-              <div className="mt-2 flex items-center gap-2">
-                <StarRating value={avgRating} />
-                <span className="text-sm font-bold text-gray-800">{avgRating > 0 ? avgRating.toFixed(1) : '—'}</span>
-                {ratings.length > 0 && (
-                  <span className="text-sm text-gray-400">{ratings.length} відгуків</span>
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-xl font-bold text-gray-900">
+                  {profile.first_name} {profile.last_name?.[0]}.
+                </h1>
+                {mp?.is_verified && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-green-200">
+                    ✓ Верифіковано
+                  </span>
                 )}
               </div>
-            )}
 
-            {/* Languages */}
-            {profile.languages?.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {profile.languages.map((lang: string) => (
-                  <span key={lang} className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-xs text-gray-500">
-                    {lang}
-                  </span>
-                ))}
+              {/* Location / experience */}
+              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
+                {profile.postcode && <span>📍 {profile.postcode}</span>}
+                {mp?.experience_years > 0 && (
+                  <span>🛠 {mp.experience_years} р. досвіду</span>
+                )}
+                {mp?.radius_miles > 0 && <span>🚗 до {mp.radius_miles} миль</span>}
               </div>
-            )}
+
+              {/* Rating row */}
+              {(avgRating > 0 || ratings.length > 0) && (
+                <div className="mt-2 flex items-center gap-2">
+                  <StarRating value={avgRating} />
+                  <span className="text-sm font-bold text-gray-800">{avgRating > 0 ? avgRating.toFixed(1) : '—'}</span>
+                  {ratings.length > 0 && (
+                    <span className="text-sm text-gray-400">{ratings.length} відгуків</span>
+                  )}
+                </div>
+              )}
+
+              {/* Languages */}
+              {profile.languages?.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {profile.languages.map((lang: string) => (
+                    <span key={lang} className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-xs text-gray-500">
+                      {lang}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ── Body: left content + right sidebar ── */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
