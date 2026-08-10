@@ -36,8 +36,8 @@ export const OrderSearchPage = () => {
   const { isAuthenticated, _hasHydrated, user, setAuth } = useAuthStore()
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
-  const [selectedWorkType, setSelectedWorkType] = useState<number>(
-    Number(searchParams?.get('work_type_id')) || 0
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(
+    Number(searchParams?.get('category_id')) || 0
   )
   // orderId → { message, price }
   const [responseForm, setResponseForm] = useState<Record<string, { message: string; price: string }>>({})
@@ -106,9 +106,20 @@ export const OrderSearchPage = () => {
     staleTime: Infinity,
   })
 
+  const { data: categoriesData } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const res = await apiClient.get('/api/v1/categories')
+      return res.data.categories ?? []
+    },
+    staleTime: Infinity,
+  })
+
   const workTypeMap: Record<number, string> = {}
+  const workTypeCategoryMap: Record<number, number> = {}
   for (const wt of workTypesData ?? []) {
     workTypeMap[wt.id] = wt.name
+    workTypeCategoryMap[wt.id] = wt.category_id
   }
 
   const respondMutation = useMutation({
@@ -255,10 +266,10 @@ export const OrderSearchPage = () => {
         o.title?.toLowerCase().includes(q) ||
         o.description?.toLowerCase().includes(q) ||
         o.address?.toLowerCase().includes(q)
-      const matchesType = !selectedWorkType || o.work_type_id === selectedWorkType
+      const matchesType = !selectedCategoryId || workTypeCategoryMap[o.work_type_id] === selectedCategoryId
       return matchesText && matchesType
     })
-  }, [ordersData, search, selectedWorkType])
+  }, [ordersData, search, selectedCategoryId, workTypesData])
 
   if (!_hasHydrated || isLoading) {
     return (
@@ -282,13 +293,13 @@ export const OrderSearchPage = () => {
           className="flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
         />
         <select
-          value={selectedWorkType}
-          onChange={e => setSelectedWorkType(Number(e.target.value))}
+          value={selectedCategoryId}
+          onChange={e => setSelectedCategoryId(Number(e.target.value))}
           className="rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
         >
-          <option value={0}>Всі послуги</option>
-          {(workTypesData ?? []).map((wt: any) => (
-            <option key={wt.id} value={wt.id}>{wt.name}</option>
+          <option value={0}>Всі категорії</option>
+          {(categoriesData ?? []).map((cat: any) => (
+            <option key={cat.id} value={cat.id}>{cat.icon ? `${cat.icon} ` : ''}{cat.name_en || cat.name}</option>
           ))}
         </select>
       </div>
