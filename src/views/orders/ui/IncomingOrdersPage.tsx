@@ -9,6 +9,7 @@ import { useAuthStore } from '@/entities/user/model/userStore'
 import { Spinner } from '@/shared/ui/Spinner'
 import { Badge } from '@/shared/ui/Badge'
 import { OrderChat } from '@/widgets/order-chat/ui/OrderChat'
+import { RateUserForm } from '@/widgets/rate-user/ui/RateUserForm'
 import { useUnreadMessages } from '@/shared/hooks/useUnreadMessages'
 import { useUnreadStore } from '@/shared/model/unreadStore'
 import { markAsRead } from '@/shared/lib/unreadMessages'
@@ -351,6 +352,12 @@ export const IncomingOrdersPage = () => {
                         >
                           {completeMutation.isPending ? 'Завершуємо...' : '✅ Виконано'}
                         </button>
+                      </div>
+                    )}
+
+                    {order.status === 'COMPLETED' && (
+                      <div className="mt-4 border-t border-gray-100 pt-4">
+                        <RateUserForm ratedId={order.customer_id} label="замовника" />
                       </div>
                     )}
                   </div>

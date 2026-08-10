@@ -9,8 +9,8 @@ export interface Master {
 }
 
 export interface Rating {
-  customerId: string
-  customerName: string
+  raterId: string
+  raterName: string
   rating: number
   comment: string
   createdAt: string

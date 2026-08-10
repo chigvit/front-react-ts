@@ -78,7 +78,7 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
   const { data: ratingsData } = useQuery({
     queryKey: ['master-ratings', masterId],
     queryFn: async () => {
-      const res = await apiClient.get('/api/v1/ratings', { params: { master_id: masterId } })
+      const res = await apiClient.get('/api/v1/ratings', { params: { rated_id: masterId } })
       return res.data
     },
   })
@@ -237,7 +237,7 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
                 {ratings.map((r: any, i: number) => (
                   <div key={i} className="py-4 first:pt-0 last:pb-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-semibold text-gray-800">{r.customer_name || 'Замовник'}</span>
+                      <span className="text-sm font-semibold text-gray-800">{r.rater_name || 'Замовник'}</span>
                       <div className="flex items-center gap-2 shrink-0">
                         <StarRating value={r.rating} />
                         {r.created_at && (

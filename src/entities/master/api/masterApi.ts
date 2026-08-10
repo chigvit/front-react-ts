@@ -11,8 +11,13 @@ export const masterApi = {
     return res.data
   },
 
-  getRatings: async (masterId: string): Promise<{ ratings: Rating[]; averageRating: number; totalCount: number }> => {
-    const res = await apiClient.get('/api/v1/ratings', { params: { master_id: masterId } })
+  getRatings: async (ratedId: string): Promise<{ ratings: Rating[]; averageRating: number; totalCount: number }> => {
+    const res = await apiClient.get('/api/v1/ratings', { params: { rated_id: ratedId } })
+    return res.data
+  },
+
+  addRating: async (ratedId: string, rating: number, comment: string): Promise<{ message: string }> => {
+    const res = await apiClient.post('/api/v1/ratings', { rated_id: ratedId, rating, comment })
     return res.data
   },
 

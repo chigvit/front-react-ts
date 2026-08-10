@@ -10,6 +10,7 @@ import { Spinner } from '@/shared/ui/Spinner'
 import { Badge } from '@/shared/ui/Badge'
 import { MastersSidebar } from '@/widgets/masters-sidebar/ui/MastersSidebar'
 import { OrderChat } from '@/widgets/order-chat/ui/OrderChat'
+import { RateUserForm } from '@/widgets/rate-user/ui/RateUserForm'
 import { useUnreadMessages } from '@/shared/hooks/useUnreadMessages'
 import { useUnreadStore } from '@/shared/model/unreadStore'
 import { markAsRead } from '@/shared/lib/unreadMessages'
@@ -468,6 +469,12 @@ export const MyOrdersPage = () => {
                           </button>
                         )}
                       </div>
+
+                      {order.status === 'COMPLETED' && order.master_id && (
+                        <div className="mt-4 border-t border-gray-100 pt-4">
+                          <RateUserForm ratedId={order.master_id} label="виконавця" />
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
