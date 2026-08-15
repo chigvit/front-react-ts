@@ -8,9 +8,12 @@ interface Props {
   orderId: string
   myRole: 'customer' | 'master'
   masterId?: string
+  // Початковий текст відгуку на замовлення — показуємо як перше повідомлення
+  // в тій самій рамці, щоб не дублювати бульбашку окремо над чатом.
+  leadingMessage?: string
 }
 
-export const OrderChat = ({ orderId, myRole, masterId }: Props) => {
+export const OrderChat = ({ orderId, myRole, masterId, leadingMessage }: Props) => {
   const queryClient = useQueryClient()
   const [text, setText] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -53,7 +56,14 @@ export const OrderChat = ({ orderId, myRole, masterId }: Props) => {
     <div className="flex flex-col gap-3">
       {/* Повідомлення */}
       <div className="flex max-h-64 flex-col gap-2 overflow-y-auto rounded-lg border border-gray-100 bg-gray-50 p-3">
-        {messages.length === 0 ? (
+        {leadingMessage && (
+          <div className="flex flex-col items-end gap-0.5">
+            <div className="max-w-[80%] rounded-xl px-3 py-2 text-sm bg-orange-500 text-white">
+              {leadingMessage}
+            </div>
+          </div>
+        )}
+        {messages.length === 0 && !leadingMessage ? (
           <p className="text-center text-xs text-gray-400">Повідомлень ще немає</p>
         ) : (
           messages.map((msg: any) => {

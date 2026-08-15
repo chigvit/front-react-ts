@@ -408,14 +408,7 @@ export const OrderSearchPage = () => {
                       {last ? (
                         <>
                           <p className="text-sm text-gray-500">✓ Ви вже відгукнулись на це замовлення:</p>
-                          <div className="flex justify-end">
-                            <div className="max-w-xs rounded-xl rounded-tr-sm bg-orange-500 px-3 py-2 text-sm text-white">
-                              {last}
-                            </div>
-                          </div>
-                          <div className="border-t border-gray-100 pt-3">
-                            <OrderChat orderId={order.id} myRole="master" />
-                          </div>
+                          <OrderChat orderId={order.id} myRole="master" leadingMessage={last} />
                         </>
                       ) : showAuthFlow ? (
                         <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
