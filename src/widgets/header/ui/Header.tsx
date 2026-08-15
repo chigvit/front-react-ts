@@ -3,11 +3,14 @@
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import { apiClient } from '@/shared/api/client'
 import { useAuthStore } from '@/entities/user/model/userStore'
 import { userApi } from '@/entities/user/api/userApi'
 import { CreateOrderDropdown } from './CreateOrderDropdown'
 import { SearchOrdersDropdown } from './SearchOrdersDropdown'
 import { useUnreadStore } from '@/shared/model/unreadStore'
+import { useUnreadMessages } from '@/shared/hooks/useUnreadMessages'
 
 export const Header = () => {
   const { isAuthenticated, user, _hasHydrated, logout, refreshToken } = useAuthStore()
@@ -38,6 +41,31 @@ export const Header = () => {
 
   const isMaster = user?.role === 'USER_TYPE_MASTER'
   const unreadCount = useUnreadStore((s) => s.unreadOrderIds.size)
+
+  // Лічильник непрочитаних рахуємо тут (а не лише на сторінках "Мої
+  // замовлення"/"Вхідні замовлення"), щоб бейдж у шапці працював на будь-якій
+  // сторінці, а не зникав одразу після заходу деінде чи перезавантаження.
+  const { data: myOrdersForUnread } = useQuery({
+    queryKey: ['my-orders'],
+    queryFn: async () => {
+      const res = await apiClient.get('/api/v1/orders/my')
+      return res.data.orders ?? []
+    },
+    enabled: _hasHydrated && isAuthenticated(),
+    staleTime: 15_000,
+  })
+  useUnreadMessages(myOrdersForUnread ?? [], 'customer')
+
+  const { data: incomingOrdersForUnread } = useQuery({
+    queryKey: ['incoming-orders'],
+    queryFn: async () => {
+      const res = await apiClient.get('/api/v1/orders/incoming')
+      return res.data.orders ?? []
+    },
+    enabled: _hasHydrated && isAuthenticated(),
+    staleTime: 15_000,
+  })
+  useUnreadMessages(incomingOrdersForUnread ?? [], 'master')
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
