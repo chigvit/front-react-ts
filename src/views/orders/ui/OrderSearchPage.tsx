@@ -318,7 +318,9 @@ export const OrderSearchPage = () => {
             const myResponse = myResponseByOrder[order.id]
             const last = myResponse?.message
             const error = responseError[order.id]
-            const showChat = !!showChatForOrder[order.id]
+            // Якщо майстер вже відгукнувся — переписку показуємо одразу,
+            // без додаткового кліку на "Переписка із замовником".
+            const showChat = showChatForOrder[order.id] ?? !!last
             const showAuthFlow = authOrderId === order.id
 
             return (
