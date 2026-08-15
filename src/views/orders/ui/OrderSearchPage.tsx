@@ -42,7 +42,6 @@ export const OrderSearchPage = () => {
   // orderId → { message, price }
   const [responseForm, setResponseForm] = useState<Record<string, { message: string; price: string }>>({})
   const [responseError, setResponseError] = useState<Record<string, string>>({})
-  const [showChatForOrder, setShowChatForOrder] = useState<Record<string, boolean>>({})
 
   // ─── Гостьовий флоу для незалогінених (відгукнутись без акаунту) ───
   const [authOrderId, setAuthOrderId] = useState<string | null>(null)
@@ -318,9 +317,6 @@ export const OrderSearchPage = () => {
             const myResponse = myResponseByOrder[order.id]
             const last = myResponse?.message
             const error = responseError[order.id]
-            // Якщо майстер вже відгукнувся — переписку показуємо одразу,
-            // без додаткового кліку на "Переписка із замовником".
-            const showChat = showChatForOrder[order.id] ?? !!last
             const showAuthFlow = authOrderId === order.id
 
             return (
@@ -417,17 +413,9 @@ export const OrderSearchPage = () => {
                               {last}
                             </div>
                           </div>
-                          <button
-                            onClick={() => setShowChatForOrder(prev => ({ ...prev, [order.id]: !prev[order.id] }))}
-                            className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
-                          >
-                            {showChat ? 'Згорнути переписку' : 'Переписка із замовником'}
-                          </button>
-                          {showChat && (
-                            <div className="border-t border-gray-100 pt-3">
-                              <OrderChat orderId={order.id} myRole="master" />
-                            </div>
-                          )}
+                          <div className="border-t border-gray-100 pt-3">
+                            <OrderChat orderId={order.id} myRole="master" />
+                          </div>
                         </>
                       ) : showAuthFlow ? (
                         <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
