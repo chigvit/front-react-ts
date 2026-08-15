@@ -51,8 +51,6 @@ export const OrderChat = ({ orderId, myRole, masterId }: Props) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm font-medium text-gray-600">Переписка</p>
-
       {/* Повідомлення */}
       <div className="flex max-h-64 flex-col gap-2 overflow-y-auto rounded-lg border border-gray-100 bg-gray-50 p-3">
         {messages.length === 0 ? (
