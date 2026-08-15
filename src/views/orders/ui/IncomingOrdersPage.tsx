@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -95,6 +95,21 @@ export const IncomingOrdersPage = () => {
       }
     }
   }, [ordersData, addUnread])
+
+  // Замовлення з непрочитаним повідомленням розгортаємо одразу — без
+  // додаткового кліку "Деталі" — і одразу позначаємо прочитаним.
+  const autoExpandedRef = useRef(false)
+  useEffect(() => {
+    if (autoExpandedRef.current || !ordersData || unreadOrderIds.size === 0) return
+    const firstUnread = ordersData.find((o: any) => unreadOrderIds.has(o.id))
+    if (firstUnread) {
+      autoExpandedRef.current = true
+      setExpandedId(firstUnread.id)
+      markAsRead(firstUnread.id)
+      markOrderSeen(firstUnread.id)
+      removeUnread(firstUnread.id)
+    }
+  }, [ordersData, unreadOrderIds, removeUnread])
 
   const shareContactMutation = useMutation({
     mutationFn: (orderId: string) => apiClient.post(`/api/v1/orders/${orderId}/share-contact`),
