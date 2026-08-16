@@ -157,21 +157,21 @@ function EditForm({ order, orderId }: EditFormProps) {
 
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Дата виконання</label>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
               <input
                 type="date"
                 value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
                 min={new Date().toISOString().slice(0, 10)}
-                className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400 sm:flex-1"
               />
-              <span className="shrink-0 text-sm text-gray-400">—</span>
+              <span className="hidden shrink-0 text-sm text-gray-400 sm:block">—</span>
               <input
                 type="date"
                 value={scheduledTo}
                 onChange={(e) => setScheduledTo(e.target.value)}
                 min={scheduledAt || new Date().toISOString().slice(0, 10)}
-                className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400 sm:flex-1"
               />
             </div>
           </div>
