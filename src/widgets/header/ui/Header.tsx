@@ -79,10 +79,10 @@ export const Header = () => {
         {/* Nav */}
         <nav className="hidden items-center gap-6 md:flex">
           <CreateOrderDropdown />
+          <SearchOrdersDropdown />
           <Link href="/categories" className="text-sm text-gray-600 hover:text-orange-500">
             Категорії
           </Link>
-          <SearchOrdersDropdown />
           <Link href="/masters" className="text-sm text-gray-600 hover:text-orange-500">
             Майстри
           </Link>
