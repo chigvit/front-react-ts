@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { apiClient } from '@/shared/api/client'
 import { Spinner } from '@/shared/ui/Spinner'
+import { Lightbox } from '@/shared/ui/Lightbox'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
@@ -47,6 +48,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 // a master's card in the list, without navigating to another page).
 export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
   const [ordersOpen, setOrdersOpen] = useState(false)
+  const [zoomedPhoto, setZoomedPhoto] = useState<string | null>(null)
 
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['master-profile', masterId],
@@ -204,16 +206,25 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
             <Section title="Portfolio">
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {portfolioPhotos.map((url) => (
-                  <div key={url} className="relative z-0 aspect-square w-full hover:z-30">
+                  <button
+                    key={url}
+                    type="button"
+                    onClick={() => setZoomedPhoto(url)}
+                    className="aspect-square w-full cursor-zoom-in overflow-hidden rounded-xl border border-gray-100 transition-opacity hover:opacity-90"
+                  >
                     <img
                       src={`${API_URL}${url}`}
                       alt="Portfolio"
-                      className="absolute inset-0 h-full w-full origin-center rounded-xl border border-gray-100 object-cover shadow-sm transition-transform duration-300 ease-out hover:scale-[2.2] hover:shadow-2xl"
+                      className="h-full w-full object-cover"
                     />
-                  </div>
+                  </button>
                 ))}
               </div>
             </Section>
+          )}
+
+          {zoomedPhoto && (
+            <Lightbox src={`${API_URL}${zoomedPhoto}`} alt="Portfolio" onClose={() => setZoomedPhoto(null)} />
           )}
 
           {/* About */}

@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/shared/api/client'
 import { Spinner } from '@/shared/ui/Spinner'
+import { Lightbox } from '@/shared/ui/Lightbox'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 const MAX_PHOTOS = 5
@@ -12,6 +13,7 @@ export const PortfolioTab = () => {
   const queryClient = useQueryClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
+  const [zoomedPhoto, setZoomedPhoto] = useState<string | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ['portfolio-photos'],
@@ -83,12 +85,14 @@ export const PortfolioTab = () => {
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {photos.map((url) => (
-          <div key={url} className="group relative z-0 aspect-square hover:z-30">
-            <img
-              src={`${API_URL}${url}`}
-              alt="Portfolio"
-              className="absolute inset-0 h-full w-full origin-center rounded-xl border border-gray-200 object-cover shadow-sm transition-transform duration-300 ease-out group-hover:scale-[2.2] group-hover:shadow-2xl"
-            />
+          <div key={url} className="group relative aspect-square">
+            <button
+              type="button"
+              onClick={() => setZoomedPhoto(url)}
+              className="h-full w-full cursor-zoom-in overflow-hidden rounded-xl border border-gray-200 transition-opacity hover:opacity-90"
+            >
+              <img src={`${API_URL}${url}`} alt="Portfolio" className="h-full w-full object-cover" />
+            </button>
             <button
               type="button"
               onClick={() => deleteMutation.mutate(url)}
@@ -129,6 +133,10 @@ export const PortfolioTab = () => {
         className="hidden"
         onChange={handleFileChange}
       />
+
+      {zoomedPhoto && (
+        <Lightbox src={`${API_URL}${zoomedPhoto}`} alt="Portfolio" onClose={() => setZoomedPhoto(null)} />
+      )}
     </div>
   )
 }
