@@ -16,6 +16,7 @@ import { markAsRead } from '@/shared/lib/unreadMessages'
 import { getSeenOrderIds, markOrderSeen } from '@/shared/lib/seenOrders'
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'info' }> = {
+  OPEN:        { label: 'Очікує рішення замовника', variant: 'warning' },
   PENDING:     { label: 'Очікує відповіді', variant: 'warning' },
   IN_PROGRESS: { label: 'В роботі',         variant: 'success' },
   COMPLETED:   { label: 'Виконано',          variant: 'info' },
@@ -37,6 +38,56 @@ export const IncomingOrdersPage = () => {
     enabled: _hasHydrated && isAuthenticated(),
   })
 
+  // Замовлення, на які майстер відгукнувся через "Пошук замовлень", але
+  // замовник ще не прийняв відгук — orders.master_id ще порожній, тож
+  // /orders/incoming їх не бачить. Дістаємо окремо, щоб переписка з ними
+  // теж була видна тут, а не лише в пошуку.
+  const { data: publicOpenOrders } = useQuery({
+    queryKey: ['public-open-orders'],
+    queryFn: async () => {
+      const res = await apiClient.get('/api/v1/orders')
+      return res.data.orders ?? []
+    },
+    enabled: _hasHydrated && isAuthenticated(),
+    staleTime: 15_000,
+  })
+
+  const { data: myOpenResponses } = useQuery({
+    queryKey: ['my-open-responses', (publicOpenOrders ?? []).map((o: any) => o.id)],
+    queryFn: async () => {
+      const orders = publicOpenOrders ?? []
+      const results = await Promise.all(
+        orders.map((o: any) =>
+          apiClient.get(`/api/v1/orders/${o.id}/responses`)
+            .then(r => ({ order: o, responses: r.data.responses ?? [] }))
+            .catch(() => ({ order: o, responses: [] as any[] }))
+        )
+      )
+      return results
+        .map(({ order, responses }) => ({
+          order,
+          mine: responses.find((r: any) => r.master_id === user?.id),
+        }))
+        .filter(({ mine }) => !!mine)
+    },
+    enabled: (publicOpenOrders?.length ?? 0) > 0 && !!user?.id,
+    staleTime: 15_000,
+  })
+
+  const pendingResponseOrders = useMemo(
+    () => (myOpenResponses ?? []).map(({ order, mine }) => ({
+      ...order,
+      _pendingResponse: true,
+      _myResponseMessage: mine.message,
+    })),
+    [myOpenResponses]
+  )
+
+  const combinedOrders = useMemo(
+    () => [...(ordersData ?? []), ...pendingResponseOrders],
+    [ordersData, pendingResponseOrders]
+  )
+
   const { data: workTypesData } = useQuery({
     queryKey: ['work-types'],
     queryFn: async () => {
@@ -52,13 +103,12 @@ export const IncomingOrdersPage = () => {
   }
 
   const customerIds = useMemo<string[]>(() => {
-    if (!ordersData) return []
     const ids = new Set<string>()
-    for (const o of ordersData) {
+    for (const o of combinedOrders) {
       if (o.customer_id) ids.add(o.customer_id)
     }
     return [...ids]
-  }, [ordersData])
+  }, [combinedOrders])
 
   const { data: customersData } = useQuery({
     queryKey: ['customer-profiles', customerIds],
@@ -80,7 +130,7 @@ export const IncomingOrdersPage = () => {
 
   const customerMap: Record<string, any> = customersData ?? {}
 
-  useUnreadMessages(ordersData ?? [], 'master')
+  useUnreadMessages(combinedOrders, 'master')
   const unreadOrderIds = useUnreadStore((s) => s.unreadOrderIds)
   const removeUnread = useUnreadStore((s) => s.removeUnread)
   const addUnread = useUnreadStore((s) => s.addUnread)
@@ -100,8 +150,8 @@ export const IncomingOrdersPage = () => {
   // додаткового кліку "Деталі" — і одразу позначаємо прочитаним.
   const autoExpandedRef = useRef(false)
   useEffect(() => {
-    if (autoExpandedRef.current || !ordersData || unreadOrderIds.size === 0) return
-    const firstUnread = ordersData.find((o: any) => unreadOrderIds.has(o.id))
+    if (autoExpandedRef.current || combinedOrders.length === 0 || unreadOrderIds.size === 0) return
+    const firstUnread = combinedOrders.find((o: any) => unreadOrderIds.has(o.id))
     if (firstUnread) {
       autoExpandedRef.current = true
       setExpandedId(firstUnread.id)
@@ -109,7 +159,7 @@ export const IncomingOrdersPage = () => {
       markOrderSeen(firstUnread.id)
       removeUnread(firstUnread.id)
     }
-  }, [ordersData, unreadOrderIds, removeUnread])
+  }, [combinedOrders, unreadOrderIds, removeUnread])
 
   const shareContactMutation = useMutation({
     mutationFn: (orderId: string) => apiClient.post(`/api/v1/orders/${orderId}/share-contact`),
@@ -153,7 +203,7 @@ export const IncomingOrdersPage = () => {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <h1 className="mb-6 text-2xl font-bold text-gray-800">Вхідні замовлення</h1>
 
-      {ordersData?.length === 0 ? (
+      {combinedOrders.length === 0 ? (
         <div className="rounded-xl border border-gray-200 bg-white p-12 text-center">
           <div className="mb-4 text-5xl">📭</div>
           <p className="text-gray-500">Немає нових замовлень.</p>
@@ -163,11 +213,12 @@ export const IncomingOrdersPage = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {ordersData?.map((order: any) => {
+          {combinedOrders.map((order: any) => {
             const statusInfo = STATUS_LABELS[order.status] ?? { label: order.status, variant: 'default' as const }
             const isExpanded = expandedId === order.id
             const isPending = order.status === 'PENDING'
             const isInProgress = order.status === 'IN_PROGRESS'
+            const isPendingResponse = !!order._pendingResponse
             const isBusy = acceptMutation.isPending || rejectMutation.isPending
             const hasUnread = unreadOrderIds.has(order.id)
 
@@ -327,6 +378,14 @@ export const IncomingOrdersPage = () => {
                         {order.master_shared_contact && !order.customer_phone && (
                           <p className="mb-3 text-xs text-gray-400">✅ Ви надали доступ до своїх контактів. Очікуйте відповіді замовника.</p>
                         )}
+                      </div>
+                    )}
+
+                    {/* Ще не прийнятий відгук — переписка вже можлива, але рішення ще за замовником */}
+                    {isPendingResponse && (
+                      <div className="mt-4 border-t border-gray-100 pt-4">
+                        <p className="mb-3 text-sm text-gray-500">Ви залишили відгук на це замовлення, очікуйте рішення замовника:</p>
+                        <OrderChat orderId={order.id} myRole="master" leadingMessage={order._myResponseMessage} />
                       </div>
                     )}
 

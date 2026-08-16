@@ -37,7 +37,7 @@ export function useUnreadMessages(
   // списки (там order.master_id ще порожній) — тож окремо дивимось усі відкриті
   // замовлення сайту і лишаємо ті, де сам майстер вже залишив відгук.
   const { data: publicOpenOrders } = useQuery({
-    queryKey: ['unread-public-open-orders'],
+    queryKey: ['public-open-orders'],
     queryFn: async () => {
       const res = await apiClient.get('/api/v1/orders')
       return res.data.orders ?? []
@@ -105,10 +105,15 @@ export function useUnreadMessages(
     refetchInterval: 30_000,
   })
 
+  // Якщо гілок листування більше немає (наприклад, замовлення видалили) —
+  // запит вище вимкнений і data лишається undefined; без цього стара мітка
+  // "непрочитано" зависала б назавжди.
+  const effectiveData = threads.length === 0 ? [] : data
+
   useEffect(() => {
-    if (!data) return
+    if (!effectiveData) return
     const nowUnread = new Set<string>()
-    for (const { orderId, messages } of data) {
+    for (const { orderId, messages } of effectiveData) {
       if (messages.length === 0) continue
       const last = messages[messages.length - 1]
       const msgTime = new Date(last.created_at).getTime()
@@ -128,5 +133,5 @@ export function useUnreadMessages(
     }
 
     ownUnread.current = nowUnread
-  }, [data, myRole, addUnread, removeUnread])
+  }, [effectiveData, myRole, addUnread, removeUnread])
 }
