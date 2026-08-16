@@ -8,6 +8,9 @@ import { apiClient } from '@/shared/api/client'
 import { useAuthStore } from '@/entities/user/model/userStore'
 import { Spinner } from '@/shared/ui/Spinner'
 import { Badge } from '@/shared/ui/Badge'
+import { Lightbox } from '@/shared/ui/Lightbox'
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'info' }> = {
   OPEN:        { label: 'Open',        variant: 'info' },
@@ -26,6 +29,7 @@ export const OrderDetailPage = ({ orderId }: Props) => {
   const queryClient = useQueryClient()
   const { user, isAuthenticated, _hasHydrated } = useAuthStore()
   const [actionError, setActionError] = useState<string | null>(null)
+  const [zoomedPhoto, setZoomedPhoto] = useState<string | null>(null)
 
   const { data: orderData, isLoading: orderLoading } = useQuery({
     queryKey: ['order', orderId],
@@ -125,6 +129,25 @@ export const OrderDetailPage = ({ orderId }: Props) => {
         </div>
 
         <p className="mb-6 text-gray-600 leading-relaxed">{order.description}</p>
+
+        {order.photos?.length > 0 && (
+          <div className="mb-6 flex flex-wrap gap-3">
+            {order.photos.map((url: string) => (
+              <button
+                key={url}
+                type="button"
+                onClick={() => setZoomedPhoto(url)}
+                className="h-20 w-20 cursor-zoom-in overflow-hidden rounded-lg border border-gray-200 transition-opacity hover:opacity-90"
+              >
+                <img src={`${API_URL}${url}`} alt="Order photo" className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {zoomedPhoto && (
+          <Lightbox src={`${API_URL}${zoomedPhoto}`} alt="Order photo" onClose={() => setZoomedPhoto(null)} />
+        )}
 
         {/* Details grid */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
@@ -13,6 +13,9 @@ import { Input } from '@/shared/ui/Input'
 import { Button } from '@/shared/ui/Button'
 import { Spinner } from '@/shared/ui/Spinner'
 import { MastersSidebar } from '@/widgets/masters-sidebar/ui/MastersSidebar'
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
+const MAX_ORDER_PHOTOS = 3
 
 const orderSchema = z.object({
   title: z.string().min(5, 'Minimum 5 characters'),
@@ -59,6 +62,10 @@ export const CreateOrderPage = () => {
   const [isResending, setIsResending] = useState(false)
   const [resendMessage, setResendMessage] = useState<string | null>(null)
   const [savedGuestPhone, setSavedGuestPhone] = useState<string | null>(null)
+  const [photoUrls, setPhotoUrls] = useState<string[]>([])
+  const [photoUploading, setPhotoUploading] = useState(false)
+  const [photoError, setPhotoError] = useState<string | null>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
 
   const { data: workTypeData } = useQuery({
     queryKey: ['work-type', workTypeId],
@@ -86,8 +93,34 @@ export const CreateOrderPage = () => {
       address: orderData.address,
       scheduled_at: orderData.scheduledAt || undefined,
       scheduled_to: orderData.scheduledTo || undefined,
+      photos: photoUrls,
     })
     return res.data
+  }
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+
+    setPhotoError(null)
+    setPhotoUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('photo', file)
+      const res = await apiClient.post('/api/v1/upload/order-photo', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      setPhotoUrls(prev => [...prev, res.data.url])
+    } catch (err: any) {
+      setPhotoError(err.response?.data?.error ?? 'Failed to upload photo')
+    } finally {
+      setPhotoUploading(false)
+    }
+  }
+
+  const removePhoto = (url: string) => {
+    setPhotoUrls(prev => prev.filter(u => u !== url))
   }
 
   const handleSubmit = async () => {
@@ -365,6 +398,54 @@ export const CreateOrderPage = () => {
                     {...orderForm.register('scheduledTo')}
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Photos — optional (up to {MAX_ORDER_PHOTOS})
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {photoUrls.map((url) => (
+                    <div key={url} className="group relative h-20 w-20 overflow-hidden rounded-lg border border-gray-200">
+                      <img src={`${API_URL}${url}`} alt="Order photo" className="h-full w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(url)}
+                        className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
+                        aria-label="Remove photo"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+
+                  {photoUrls.length < MAX_ORDER_PHOTOS && (
+                    <button
+                      type="button"
+                      onClick={() => photoInputRef.current?.click()}
+                      disabled={photoUploading}
+                      className="flex h-20 w-20 flex-col items-center justify-center gap-0.5 rounded-lg border-2 border-dashed border-gray-300 text-gray-400 transition-colors hover:border-orange-400 hover:text-orange-500 disabled:opacity-50"
+                    >
+                      {photoUploading ? (
+                        <Spinner size="sm" />
+                      ) : (
+                        <>
+                          <span className="text-xl leading-none">+</span>
+                          <span className="text-[10px] font-medium">Add photo</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+                {photoError && <p className="mt-1 text-xs text-red-500">{photoError}</p>}
+
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  className="hidden"
+                  onChange={handlePhotoChange}
+                />
               </div>
             </div>
           </div>
