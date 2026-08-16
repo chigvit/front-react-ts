@@ -51,7 +51,7 @@ export const CreateOrderDropdown = () => {
         className={`flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
           isOpen
             ? 'border-orange-500 bg-orange-50 text-orange-600'
-            : 'border-orange-500 text-orange-500 hover:bg-orange-50'
+            : 'border-transparent text-orange-500 hover:bg-orange-50'
         }`}
       >
         Create Order
