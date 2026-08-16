@@ -27,6 +27,7 @@ export const Footer = () => {
               <li><Link href="/login" className="text-sm text-gray-600 hover:text-orange-500">Log in</Link></li>
               <li><Link href="/register" className="text-sm text-gray-600 hover:text-orange-500">Sign up</Link></li>
               <li><Link href="/profile" className="text-sm text-gray-600 hover:text-orange-500">Profile</Link></li>
+              <li><Link href="/support" className="text-sm text-gray-600 hover:text-orange-500">Contact Support</Link></li>
             </ul>
           </div>
         </div>
