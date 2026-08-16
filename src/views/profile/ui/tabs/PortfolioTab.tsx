@@ -83,11 +83,11 @@ export const PortfolioTab = () => {
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {photos.map((url) => (
-          <div key={url} className="group relative z-0 aspect-square hover:z-10">
+          <div key={url} className="group relative z-0 aspect-square hover:z-30">
             <img
               src={`${API_URL}${url}`}
               alt="Portfolio"
-              className="absolute inset-0 h-full w-full rounded-xl border border-gray-200 object-cover shadow-sm transition-transform duration-300 ease-out group-hover:scale-150 group-hover:shadow-xl"
+              className="absolute inset-0 h-full w-full origin-center rounded-xl border border-gray-200 object-cover shadow-sm transition-transform duration-300 ease-out group-hover:scale-[2.2] group-hover:shadow-2xl"
             />
             <button
               type="button"
