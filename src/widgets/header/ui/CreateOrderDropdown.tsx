@@ -32,6 +32,11 @@ export const CreateOrderDropdown = ({ isOpen, onOpenChange, isActive }: Props) =
   })
 
   useEffect(() => {
+    // isOpen у замиканні: якщо це меню зараз закрите, зовнішній клік (який
+    // насправді може бути кліком усередині ІНШОГО меню в шапці) не повинен
+    // чіпати спільний стан "яке меню відкрите" — інакше клік по пункту в
+    // сусідньому дропдауні миттєво закриває той-таки дропдаун ще до навігації.
+    if (!isOpen) return
     const handleClickOutside = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         onOpenChange(false)
@@ -39,7 +44,7 @@ export const CreateOrderDropdown = ({ isOpen, onOpenChange, isActive }: Props) =
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [onOpenChange])
+  }, [isOpen, onOpenChange])
 
   useEffect(() => {
     if (isOpen && categoriesData && categoriesData.length > 0 && hoveredCategoryId === null) {

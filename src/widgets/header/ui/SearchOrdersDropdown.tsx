@@ -24,6 +24,10 @@ export const SearchOrdersDropdown = ({ isOpen, onOpenChange, isActive }: Props) 
   })
 
   useEffect(() => {
+    // Якщо це меню зараз закрите — не реагуємо на зовнішній клік, інакше
+    // клік усередині ІНШОГО (сусіднього) відкритого дропдауна теж потрапляє
+    // сюди як "зовнішній" і скидає спільний стан, закриваючи той дропдаун.
+    if (!isOpen) return
     const handleClickOutside = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         onOpenChange(false)
@@ -31,7 +35,7 @@ export const SearchOrdersDropdown = ({ isOpen, onOpenChange, isActive }: Props) 
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [onOpenChange])
+  }, [isOpen, onOpenChange])
 
   return (
     <div className="relative" ref={wrapperRef}>

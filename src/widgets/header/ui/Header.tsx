@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/shared/api/client'
@@ -37,6 +37,11 @@ export const Header = () => {
   useEffect(() => {
     setOpenDropdown(null)
   }, [pathname])
+
+  // Стабільні посилання на колбеки — щоб дочірні дропдауни не перепідписували
+  // свій "клік поза межами" листенер на кожен ре-рендер Header.
+  const handleCreateOpenChange = useCallback((open: boolean) => setOpenDropdown(open ? 'create' : null), [])
+  const handleSearchOpenChange = useCallback((open: boolean) => setOpenDropdown(open ? 'search' : null), [])
 
   const navLinkClass = (active: boolean) =>
     `rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
@@ -107,12 +112,12 @@ export const Header = () => {
         <nav className="hidden items-center gap-6 md:flex">
           <CreateOrderDropdown
             isOpen={openDropdown === 'create'}
-            onOpenChange={(open) => setOpenDropdown(open ? 'create' : null)}
+            onOpenChange={handleCreateOpenChange}
             isActive={activeNav === 'create'}
           />
           <SearchOrdersDropdown
             isOpen={openDropdown === 'search'}
-            onOpenChange={(open) => setOpenDropdown(open ? 'search' : null)}
+            onOpenChange={handleSearchOpenChange}
             isActive={activeNav === 'search'}
           />
           <Link href="/categories" className={navLinkClass(activeNav === 'categories')}>
