@@ -41,12 +41,12 @@ export const MastersPage = () => {
   return (
     <div className="flex h-[calc(100vh-64px)] flex-col">
       {/* Top bar */}
-      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-gray-200 bg-white px-4 py-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
           <h1 className="text-lg font-bold text-gray-800">Find Masters</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-gray-500">Radius:</span>
-            <div className="flex gap-1">
+            <div className="flex flex-wrap gap-1">
               {RADIUS_OPTIONS.map(r => (
                 <button
                   key={r}
@@ -64,7 +64,7 @@ export const MastersPage = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <span className="text-sm text-gray-500">
             {isLoading ? 'Searching...' : `${masters.length} masters found`}
           </span>
@@ -91,8 +91,8 @@ export const MastersPage = () => {
 
       {/* Content */}
       {view === 'map' ? (
-        <div className="flex flex-1 overflow-hidden">
-          <div className="flex-1">
+        <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
+          <div className="h-[50vh] shrink-0 md:h-auto md:flex-1">
             <MastersMap
               masters={masters}
               userLocation={location}
@@ -101,7 +101,7 @@ export const MastersPage = () => {
           </div>
 
           {masters.length > 0 && (
-            <div className="w-80 overflow-y-auto border-l border-gray-200 bg-white">
+            <div className="flex-1 overflow-y-auto border-t border-gray-200 bg-white md:flex-none md:w-80 md:border-l md:border-t-0">
               {masters.map((master: any) => (
                 <Link
                   key={master.user_id}

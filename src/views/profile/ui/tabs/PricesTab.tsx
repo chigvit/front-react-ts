@@ -124,53 +124,57 @@ export const PricesTab = () => {
       </div>
 
       <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-        {/* Header */}
-        <div className="grid grid-cols-12 gap-4 border-b border-gray-100 bg-gray-50 px-4 py-2 text-xs font-medium text-gray-500">
+        {/* Header — тільки для табличного вигляду з sm і вище */}
+        <div className="hidden sm:grid sm:grid-cols-12 gap-4 border-b border-gray-100 bg-gray-50 px-4 py-2 text-xs font-medium text-gray-500">
           <div className="col-span-5">Service</div>
           <div className="col-span-3">Price</div>
           <div className="col-span-3">Unit</div>
           <div className="col-span-1">Currency</div>
         </div>
 
-        {/* Rows */}
+        {/* Rows — на мобільному кожен рядок стає карткою з підписаними полями */}
         {items.map((item, index) => (
           <div key={item.workTypeId}>
             {index > 0 && <div className="border-t border-gray-100" />}
-            <div className="grid grid-cols-12 items-center gap-4 px-4 py-3">
-              <div className="col-span-5 text-sm font-medium text-gray-800">
+            <div className="flex flex-col gap-3 px-4 py-3 sm:grid sm:grid-cols-12 sm:items-center sm:gap-4">
+              <div className="text-sm font-medium text-gray-800 sm:col-span-5">
                 {item.name}
               </div>
 
-              <div className="col-span-3">
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={item.price || ''}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(',', '.')
-                    if (v === '' || /^\d*\.?\d*$/.test(v)) {
-                      updateItem(item.workTypeId, 'price', parseFloat(v) || 0)
-                    }
-                  }}
-                  placeholder="0"
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                />
-              </div>
+              <div className="flex items-center gap-3 sm:contents">
+                <div className="flex-1 sm:col-span-3">
+                  <span className="mb-1 block text-xs text-gray-500 sm:hidden">Price</span>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={item.price || ''}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(',', '.')
+                      if (v === '' || /^\d*\.?\d*$/.test(v)) {
+                        updateItem(item.workTypeId, 'price', parseFloat(v) || 0)
+                      }
+                    }}
+                    placeholder="0"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                  />
+                </div>
 
-              <div className="col-span-3">
-                <select
-                  value={item.unit}
-                  onChange={(e) => updateItem(item.workTypeId, 'unit', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                >
-                  {UNITS.map(unit => (
-                    <option key={unit} value={unit}>{unit}</option>
-                  ))}
-                </select>
-              </div>
+                <div className="flex-1 sm:col-span-3">
+                  <span className="mb-1 block text-xs text-gray-500 sm:hidden">Unit</span>
+                  <select
+                    value={item.unit}
+                    onChange={(e) => updateItem(item.workTypeId, 'unit', e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                  >
+                    {UNITS.map(unit => (
+                      <option key={unit} value={unit}>{unit}</option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="col-span-1 text-sm font-medium text-gray-500">
-                {item.currency}
+                <div className="text-sm font-medium text-gray-500 sm:col-span-1">
+                  {item.currency}
+                </div>
               </div>
             </div>
           </div>

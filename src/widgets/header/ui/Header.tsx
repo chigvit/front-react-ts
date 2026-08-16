@@ -15,6 +15,7 @@ import { useUnreadMessages } from '@/shared/hooks/useUnreadMessages'
 export const Header = () => {
   const { isAuthenticated, user, _hasHydrated, logout, refreshToken } = useAuthStore()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const pathname = usePathname()
@@ -36,6 +37,7 @@ export const Header = () => {
   // Закриваємо відкрите меню при переході на іншу сторінку
   useEffect(() => {
     setOpenDropdown(null)
+    setMobileMenuOpen(false)
   }, [pathname])
 
   // Стабільні посилання на колбеки — щоб дочірні дропдауни не перепідписували
@@ -103,9 +105,9 @@ export const Header = () => {
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-orange-500">Майстер</span>
-          <span className="text-2xl font-bold text-gray-800">Онлайн</span>
+        <Link href="/" className="flex items-center gap-1.5 sm:gap-2">
+          <span className="text-xl font-bold text-orange-500 sm:text-2xl">Майстер</span>
+          <span className="text-xl font-bold text-gray-800 sm:text-2xl">Онлайн</span>
         </Link>
 
         {/* Nav */}
@@ -128,8 +130,8 @@ export const Header = () => {
           </Link>
         </nav>
 
-        {/* Auth */}
-        <div className="flex items-center gap-3 min-w-[160px] justify-end">
+        {/* Auth — desktop only, mobile has its own compact block below */}
+        <div className="hidden md:flex items-center gap-3 min-w-[160px] justify-end">
           {!_hasHydrated ? (
             <div className="h-8 w-32 rounded-lg bg-gray-100" />
           ) : isAuthenticated() ? (
@@ -266,7 +268,114 @@ export const Header = () => {
             </div>
           )}
         </div>
+
+        {/* Mobile: компактний аватар + гамбургер замість повного меню */}
+        <div className="flex items-center gap-1 md:hidden">
+          {_hasHydrated && isAuthenticated() && (
+            <Link href="/profile" className="relative shrink-0" onClick={() => setMobileMenuOpen(false)}>
+              <div className="flex h-8 w-8 overflow-hidden rounded-full border border-gray-200">
+                {user?.avatarUrl ? (
+                  <img src={`http://localhost:8080${user.avatarUrl}`} alt="Avatar" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-orange-100 text-sm font-bold text-orange-500">
+                    {user?.firstName?.[0]}{user?.lastName?.[0]}
+                  </div>
+                )}
+              </div>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white ring-2 ring-white">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </Link>
+          )}
+          <button
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            aria-label={mobileMenuOpen ? 'Закрити меню' : 'Відкрити меню'}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-50"
+          >
+            <span className="text-xl leading-none">{mobileMenuOpen ? '✕' : '☰'}</span>
+          </button>
+        </div>
       </div>
+
+      {/* Мобільне випадне меню — усі пункти навігації одним списком, без флайаутів */}
+      {mobileMenuOpen && (
+        <nav className="border-t border-gray-200 bg-white md:hidden">
+          <div className="flex flex-col divide-y divide-gray-100">
+            <Link href="/orders/create" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-orange-50">
+              🛠️ Create Order
+            </Link>
+            <Link href="/orders/search" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-orange-50">
+              🔍 Пошук замовлень
+            </Link>
+            <Link href="/categories" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-orange-50">
+              📂 Категорії
+            </Link>
+            <Link href="/masters" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-orange-50">
+              👷 Майстри
+            </Link>
+
+            {!_hasHydrated ? null : isAuthenticated() ? (
+              <>
+                <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm text-gray-700 hover:bg-orange-50">
+                  👤 Мій профіль
+                </Link>
+                <Link href="/orders/my" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-orange-50">
+                  <span>📋 Мої замовлення</span>
+                  {!isMaster && unreadCount > 0 && (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </Link>
+                {isMaster && (
+                  <Link href="/orders/incoming" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-orange-50">
+                    <span>📥 Вхідні замовлення</span>
+                    {unreadCount > 0 && (
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </Link>
+                )}
+                <Link href="/notifications" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm text-gray-700 hover:bg-orange-50">
+                  🔔 Сповіщення
+                </Link>
+                <Link href="/messages" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm text-gray-700 hover:bg-orange-50">
+                  💬 Особисті повідомлення
+                </Link>
+                <Link href="/balance" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm text-gray-700 hover:bg-orange-50">
+                  💰 Баланс
+                </Link>
+                <button
+                  onClick={() => { setMobileMenuOpen(false); handleLogout() }}
+                  className="px-4 py-3 text-left text-sm text-red-500 hover:bg-red-50"
+                >
+                  🚪 Вихід
+                </button>
+              </>
+            ) : (
+              <div className="flex gap-2 px-4 py-3">
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Увійти
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex-1 rounded-lg bg-orange-500 px-4 py-2 text-center text-sm font-medium text-white hover:bg-orange-600"
+                >
+                  Реєстрація
+                </Link>
+              </div>
+            )}
+          </div>
+        </nav>
+      )}
     </header>
   )
 }
