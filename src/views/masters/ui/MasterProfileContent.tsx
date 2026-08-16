@@ -204,14 +204,11 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
             <Section title="Portfolio">
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {portfolioPhotos.map((url) => (
-                  <div
-                    key={url}
-                    className="aspect-square w-full overflow-hidden rounded-xl border border-gray-100"
-                  >
+                  <div key={url} className="relative z-0 aspect-square w-full hover:z-10">
                     <img
                       src={`${API_URL}${url}`}
                       alt="Portfolio"
-                      className="h-full w-full object-cover transition-transform duration-300 ease-out hover:scale-125"
+                      className="absolute inset-0 h-full w-full rounded-xl border border-gray-100 object-cover shadow-sm transition-transform duration-300 ease-out hover:scale-150 hover:shadow-xl"
                     />
                   </div>
                 ))}
