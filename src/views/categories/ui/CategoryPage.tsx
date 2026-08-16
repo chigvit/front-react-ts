@@ -84,9 +84,9 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
         )}
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
         {/* Sidebar — типи робіт */}
-        <div className="w-64 shrink-0">
+        <div className="w-full lg:w-64 lg:shrink-0">
           <div className="rounded-xl border border-gray-200 bg-white p-4">
             <div className="mb-4 flex items-center gap-2">
               <span className="text-2xl">{categoryData?.icon ?? '🔨'}</span>
@@ -212,7 +212,7 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
                             <p className="mt-2 text-sm text-gray-600 line-clamp-2">{master.bio}</p>
                           )}
 
-                          <div className="mt-3 flex gap-2">
+                          <div className="mt-3 flex flex-wrap gap-2">
                             <button
                               onClick={() => setExpandedMasterId(isExpanded ? null : master.user_id)}
                               className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
