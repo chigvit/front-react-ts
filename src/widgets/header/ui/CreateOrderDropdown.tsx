@@ -3,12 +3,15 @@
 import { useState, useRef, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { apiClient } from '@/shared/api/client'
 
 export const CreateOrderDropdown = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [hoveredCategoryId, setHoveredCategoryId] = useState<number | null>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const pathname = usePathname()
+  const isActive = isOpen || pathname?.startsWith('/orders/create')
 
   const { data: categoriesData } = useQuery({
     queryKey: ['categories-with-work-types-dropdown'],
@@ -49,7 +52,7 @@ export const CreateOrderDropdown = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
-          isOpen
+          isActive
             ? 'border-orange-500 bg-orange-50 text-orange-600'
             : 'border-transparent text-orange-500 hover:bg-orange-50'
         }`}
