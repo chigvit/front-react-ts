@@ -7,7 +7,7 @@ import { Button } from '@/shared/ui/Button'
 
 interface Props {
   ratedId: string
-  // Кого оцінюємо — для тексту в формі ("майстра" / "замовника")
+  // Who is being rated — for the text in the form ("master" / "customer")
   label: string
   onDone?: () => void
 }
@@ -37,9 +37,9 @@ function Star({ filled, onClick, onMouseEnter, onMouseLeave }: {
   )
 }
 
-// Форма виставлення оцінки (1-5 зірок + коментар) будь-якому користувачу —
-// однаково використовується і для "замовник оцінює майстра", і для
-// "майстер оцінює замовника", різниця лише в ratedId/label з боку виклику.
+// Form for submitting a rating (1-5 stars + comment) to any user —
+// used the same way for both "customer rates master" and
+// "master rates customer", the only difference being ratedId/label from the caller.
 export const RateUserForm = ({ ratedId, label, onDone }: Props) => {
   const queryClient = useQueryClient()
   const [rating, setRating] = useState(0)
@@ -60,19 +60,19 @@ export const RateUserForm = ({ ratedId, label, onDone }: Props) => {
       const status = err?.response?.status
       setError(
         status === 409
-          ? 'Ви вже залишали оцінку.'
-          : err?.response?.data?.error ?? 'Не вдалося надіслати оцінку. Спробуйте ще раз.'
+          ? 'You have already left a rating.'
+          : err?.response?.data?.error ?? 'Failed to submit rating. Please try again.'
       )
     },
   })
 
   if (submitted) {
-    return <p className="text-sm text-green-600">✓ Дякуємо за оцінку!</p>
+    return <p className="text-sm text-green-600">✓ Thank you for your rating!</p>
   }
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm font-medium text-gray-700">Оцініть {label}</p>
+      <p className="text-sm font-medium text-gray-700">Rate {label}</p>
       <div className="flex items-center gap-0.5">
         {[1, 2, 3, 4, 5].map(n => (
           <Star
@@ -86,7 +86,7 @@ export const RateUserForm = ({ ratedId, label, onDone }: Props) => {
       </div>
       <textarea
         rows={2}
-        placeholder="Коментар (необов'язково)..."
+        placeholder="Comment (optional)..."
         value={comment}
         onChange={e => setComment(e.target.value)}
         className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 resize-none"
@@ -99,7 +99,7 @@ export const RateUserForm = ({ ratedId, label, onDone }: Props) => {
         size="sm"
         className="self-start"
       >
-        Надіслати оцінку
+        Submit Rating
       </Button>
     </div>
   )

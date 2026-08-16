@@ -10,11 +10,11 @@ import { Spinner } from '@/shared/ui/Spinner'
 import { Badge } from '@/shared/ui/Badge'
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'info' }> = {
-  OPEN:        { label: 'Відкрите',     variant: 'info' },
-  IN_PROGRESS: { label: 'В процесі',    variant: 'warning' },
-  COMPLETED:   { label: 'Завершено',    variant: 'success' },
-  CANCELLED:   { label: 'Скасовано',   variant: 'danger' },
-  PENDING:     { label: 'Очікує',       variant: 'default' },
+  OPEN:        { label: 'Open',        variant: 'info' },
+  IN_PROGRESS: { label: 'In Progress', variant: 'warning' },
+  COMPLETED:   { label: 'Completed',   variant: 'success' },
+  CANCELLED:   { label: 'Cancelled',   variant: 'danger' },
+  PENDING:     { label: 'Pending',     variant: 'default' },
 }
 
 interface Props {
@@ -51,7 +51,7 @@ export const OrderDetailPage = ({ orderId }: Props) => {
       queryClient.invalidateQueries({ queryKey: ['order', orderId] })
       queryClient.invalidateQueries({ queryKey: ['my-orders'] })
     },
-    onError: () => setActionError('Не вдалося скасувати замовлення'),
+    onError: () => setActionError('Failed to cancel order'),
   })
 
   const completeMutation = useMutation({
@@ -60,7 +60,7 @@ export const OrderDetailPage = ({ orderId }: Props) => {
       queryClient.invalidateQueries({ queryKey: ['order', orderId] })
       queryClient.invalidateQueries({ queryKey: ['my-orders'] })
     },
-    onError: () => setActionError('Не вдалося завершити замовлення'),
+    onError: () => setActionError('Failed to complete order'),
   })
 
   const acceptResponseMutation = useMutation({
@@ -70,7 +70,7 @@ export const OrderDetailPage = ({ orderId }: Props) => {
       queryClient.invalidateQueries({ queryKey: ['order', orderId] })
       queryClient.invalidateQueries({ queryKey: ['order-responses', orderId] })
     },
-    onError: () => setActionError('Не вдалося прийняти відгук'),
+    onError: () => setActionError('Failed to accept response'),
   })
 
   if (_hasHydrated && !isAuthenticated()) {
@@ -89,9 +89,9 @@ export const OrderDetailPage = ({ orderId }: Props) => {
   if (!orderData) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-8 text-center">
-        <p className="text-gray-500">Замовлення не знайдено.</p>
+        <p className="text-gray-500">Order not found.</p>
         <Link href="/orders/my" className="mt-4 inline-block text-orange-500 hover:underline">
-          ← Мої замовлення
+          ← My Orders
         </Link>
       </div>
     )
@@ -112,9 +112,9 @@ export const OrderDetailPage = ({ orderId }: Props) => {
           href="/orders/my"
           className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
         >
-          ← Назад
+          ← Back
         </Link>
-        <h1 className="text-xl font-bold text-gray-800">Деталі замовлення</h1>
+        <h1 className="text-xl font-bold text-gray-800">Order Details</h1>
       </div>
 
       {/* Order card */}
@@ -137,39 +137,39 @@ export const OrderDetailPage = ({ orderId }: Props) => {
           {order.budget > 0 && (
             <div className="flex items-center gap-2 text-gray-600">
               <span>💰</span>
-              <span>Бюджет: <span className="font-medium text-gray-800">£{order.budget}</span></span>
+              <span>Budget: <span className="font-medium text-gray-800">£{order.budget}</span></span>
             </div>
           )}
           {order.final_price > 0 && (
             <div className="flex items-center gap-2 text-gray-600">
               <span>✅</span>
-              <span>Фінальна ціна: <span className="font-medium text-green-600">£{order.final_price}</span></span>
+              <span>Final price: <span className="font-medium text-green-600">£{order.final_price}</span></span>
             </div>
           )}
           <div className="flex items-center gap-2 text-gray-600">
             <span>📋</span>
-            <span>Тип: <span className="font-medium text-gray-800">{order.order_type === 'DIRECT' ? '🎯 Пряме' : '🌐 Відкрите'}</span></span>
+            <span>Type: <span className="font-medium text-gray-800">{order.order_type === 'DIRECT' ? '🎯 Direct' : '🌐 Open'}</span></span>
           </div>
           {order.work_type_id > 0 && (
             <div className="flex items-center gap-2 text-gray-600">
               <span>🔧</span>
-              <span>Послуга ID: <span className="font-medium text-gray-800">#{order.work_type_id}</span></span>
+              <span>Service ID: <span className="font-medium text-gray-800">#{order.work_type_id}</span></span>
             </div>
           )}
           <div className="flex items-center gap-2 text-gray-600">
             <span>🕐</span>
-            <span>Створено: <span className="font-medium text-gray-800">{new Date(order.created_at).toLocaleString('uk-UA')}</span></span>
+            <span>Created: <span className="font-medium text-gray-800">{new Date(order.created_at).toLocaleString('en-GB')}</span></span>
           </div>
           {order.scheduled_at && (
             <div className="flex items-center gap-2 text-gray-600">
               <span>📅</span>
-              <span>Заплановано: <span className="font-medium text-gray-800">{new Date(order.scheduled_at).toLocaleString('uk-UA')}</span></span>
+              <span>Scheduled: <span className="font-medium text-gray-800">{new Date(order.scheduled_at).toLocaleString('en-GB')}</span></span>
             </div>
           )}
           {order.completed_at && (
             <div className="flex items-center gap-2 text-gray-600">
               <span>🏁</span>
-              <span>Завершено: <span className="font-medium text-gray-800">{new Date(order.completed_at).toLocaleString('uk-UA')}</span></span>
+              <span>Completed: <span className="font-medium text-gray-800">{new Date(order.completed_at).toLocaleString('en-GB')}</span></span>
             </div>
           )}
         </div>
@@ -183,7 +183,7 @@ export const OrderDetailPage = ({ orderId }: Props) => {
                 disabled={cancelMutation.isPending}
                 className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
               >
-                {cancelMutation.isPending ? 'Скасування...' : 'Скасувати замовлення'}
+                {cancelMutation.isPending ? 'Cancelling...' : 'Cancel Order'}
               </button>
             )}
             {canComplete && (
@@ -192,7 +192,7 @@ export const OrderDetailPage = ({ orderId }: Props) => {
                 disabled={completeMutation.isPending}
                 className="rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 transition-colors disabled:opacity-50"
               >
-                {completeMutation.isPending ? 'Завершення...' : 'Завершити замовлення'}
+                {completeMutation.isPending ? 'Completing...' : 'Complete Order'}
               </button>
             )}
           </div>
@@ -206,7 +206,7 @@ export const OrderDetailPage = ({ orderId }: Props) => {
       {/* Responses */}
       <div className="mt-6">
         <h3 className="mb-3 text-lg font-semibold text-gray-800">
-          Відгуки майстрів
+          Master Responses
           {responses.length > 0 && (
             <span className="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-sm font-medium text-orange-600">
               {responses.length}
@@ -221,7 +221,7 @@ export const OrderDetailPage = ({ orderId }: Props) => {
         ) : responses.length === 0 ? (
           <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-400">
             <div className="mb-2 text-3xl">💬</div>
-            <p>Поки що немає відгуків від майстрів</p>
+            <p>No responses from masters yet</p>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
@@ -240,10 +240,10 @@ export const OrderDetailPage = ({ orderId }: Props) => {
                         className="text-sm font-medium text-orange-500 hover:underline"
                         target="_blank"
                       >
-                        Переглянути профіль майстра →
+                        View master profile →
                       </Link>
                       {resp.is_accepted && (
-                        <Badge variant="success">✓ Прийнято</Badge>
+                        <Badge variant="success">✓ Accepted</Badge>
                       )}
                     </div>
                     {resp.message && (
@@ -253,7 +253,7 @@ export const OrderDetailPage = ({ orderId }: Props) => {
                       {resp.price > 0 && (
                         <span className="font-medium text-gray-700">£{resp.price}</span>
                       )}
-                      <span>{new Date(resp.created_at).toLocaleString('uk-UA')}</span>
+                      <span>{new Date(resp.created_at).toLocaleString('en-GB')}</span>
                     </div>
                   </div>
 
@@ -263,7 +263,7 @@ export const OrderDetailPage = ({ orderId }: Props) => {
                       disabled={acceptResponseMutation.isPending}
                       className="shrink-0 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors disabled:opacity-50"
                     >
-                      Прийняти
+                      Accept
                     </button>
                   )}
                 </div>

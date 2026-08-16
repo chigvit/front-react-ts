@@ -17,10 +17,10 @@ export function useUnreadMessages(
   const addUnread = useUnreadStore((s) => s.addUnread)
   const removeUnread = useUnreadStore((s) => s.removeUnread)
   const myUserId = useAuthStore((s) => s.user?.id)
-  // Відстежуємо які ID цей хук додав — щоб не чіпати ID від інших джерел (нові замовлення)
+  // Track which IDs this hook added — so we don't touch IDs from other sources (new orders)
   const ownUnread = useRef<Set<string>>(new Set())
 
-  // Гілки з уже призначеним виконавцем (accepted-переписка)
+  // Threads with an already-assigned master (accepted correspondence)
   const directThreads: Thread[] = orders
     .filter(
       (o) =>
@@ -33,9 +33,10 @@ export function useUnreadMessages(
     .filter((o) => o.status === 'OPEN')
     .map((o) => o.id as string)
 
-  // Для майстра гілки до прийняття виконавця не приходять у "мої"/"вхідні"
-  // списки (там order.master_id ще порожній) — тож окремо дивимось усі відкриті
-  // замовлення сайту і лишаємо ті, де сам майстер вже залишив відгук.
+  // For a master, threads before a master is accepted don't show up in the
+  // "my"/"incoming" lists (order.master_id is still empty there) — so we
+  // separately look at all open orders site-wide and keep the ones where
+  // this master has already left a response.
   const { data: publicOpenOrders } = useQuery({
     queryKey: ['public-open-orders'],
     queryFn: async () => {
@@ -66,12 +67,12 @@ export function useUnreadMessages(
       const threads: Thread[] = []
       for (const { id, responses } of results) {
         if (myRole === 'master') {
-          // майстер бачить лише свою власну гілку переписки
+          // a master sees only their own correspondence thread
           if (responses.some((r: any) => r.master_id === myUserId)) {
             threads.push({ orderId: id })
           }
         } else {
-          // замовник бачить окрему гілку з кожним майстром-кандидатом
+          // a customer sees a separate thread with each candidate master
           for (const r of responses) {
             threads.push({ orderId: id, masterId: r.master_id })
           }
@@ -105,9 +106,9 @@ export function useUnreadMessages(
     refetchInterval: 30_000,
   })
 
-  // Якщо гілок листування більше немає (наприклад, замовлення видалили) —
-  // запит вище вимкнений і data лишається undefined; без цього стара мітка
-  // "непрочитано" зависала б назавжди.
+  // If there are no more correspondence threads (e.g. the order was deleted) —
+  // the query above is disabled and data stays undefined; without this the
+  // stale "unread" marker would hang around forever.
   const effectiveData = threads.length === 0 ? [] : data
 
   useEffect(() => {
@@ -123,11 +124,11 @@ export function useUnreadMessages(
       }
     }
 
-    // Додаємо нові непрочитані повідомлення
+    // Add newly unread messages
     for (const id of nowUnread) {
       if (!ownUnread.current.has(id)) addUnread(id)
     }
-    // Знімаємо підсвітку тільки для тих, які цей хук сам додав і тепер прочитані
+    // Clear the highlight only for the ones this hook itself added and that are now read
     for (const id of ownUnread.current) {
       if (!nowUnread.has(id)) removeUnread(id)
     }

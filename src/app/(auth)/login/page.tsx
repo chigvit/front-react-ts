@@ -23,11 +23,11 @@ function LoginContent() {
     <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-gray-50 px-4 py-12">
       <Card className="w-full max-w-md">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-gray-800">Вхід в акаунт</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Log in to your account</h1>
           <p className="mt-1 text-sm text-gray-600">
-            Ще немає акаунту?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/register" className="text-orange-500 hover:underline">
-              Зареєструватись
+              Sign up
             </Link>
           </p>
         </div>
@@ -35,7 +35,7 @@ function LoginContent() {
         {verified && (
           <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3 text-center">
             <p className="text-sm font-medium text-green-700">
-              ✅ Email підтверджено! Увійдіть щоб перейти до профілю.
+              ✅ Email verified! Log in to go to your profile.
             </p>
           </div>
         )}

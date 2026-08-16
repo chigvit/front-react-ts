@@ -16,7 +16,7 @@ export const useLogin = () => {
       localStorage.setItem('access_token', data.accessToken)
       localStorage.setItem('refresh_token', data.refreshToken)
 
-      // Передаємо токен напряму в запит
+      // Pass the token directly in the request
       const profile = await userApi.getProfile(data.accessToken)
       setAuth(profile, data.accessToken, data.refreshToken)
 

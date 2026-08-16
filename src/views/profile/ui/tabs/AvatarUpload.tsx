@@ -21,7 +21,7 @@ export const AvatarUpload = () => {
     setError(null)
     setUploading(true)
 
-    // Показуємо preview одразу
+    // Show preview immediately
     const reader = new FileReader()
     reader.onload = (e) => setPreviewUrl(e.target?.result as string)
     reader.readAsDataURL(file)
@@ -34,13 +34,13 @@ export const AvatarUpload = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
 
-      // Оновлюємо профіль
+      // Update profile
       const profile = await userApi.getProfile()
       setUser(profile)
 
     } catch (err: any) {
       setPreviewUrl(null)
-      setError(err.response?.data?.error ?? 'Помилка завантаження')
+      setError(err.response?.data?.error ?? 'Upload error')
     } finally {
       setUploading(false)
     }
@@ -75,9 +75,9 @@ export const AvatarUpload = () => {
           onClick={() => fileInputRef.current?.click()}
           className="text-sm font-medium text-orange-500 hover:underline"
         >
-          {uploading ? 'Завантаження...' : 'Змінити фото'}
+          {uploading ? 'Uploading...' : 'Change photo'}
         </button>
-        <p className="text-xs text-gray-400">JPEG, PNG, WebP до 5MB</p>
+        <p className="text-xs text-gray-400">JPEG, PNG, WebP up to 5MB</p>
         {error && <p className="text-xs text-red-500">{error}</p>}
       </div>
 

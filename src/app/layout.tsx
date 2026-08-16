@@ -13,8 +13,8 @@ const notoKR = Noto_Sans_KR({
 })
 
 export const metadata: Metadata = {
-  title: 'Майстер Онлайн - Сервіс замовлення послуг',
-  description: 'Знайдіть майстра для будь-якої роботи',
+  title: 'MasterOnline - Service Booking Platform',
+  description: 'Find a master for any job',
 }
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="uk">
+    <html lang="en">
       <body className={`${inter.className} ${notoKR.variable}`}>
         <Providers>
           <div className="flex min-h-screen flex-col">

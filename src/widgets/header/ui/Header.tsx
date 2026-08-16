@@ -23,8 +23,8 @@ export const Header = () => {
   const pathname = usePathname()
   const [openDropdown, setOpenDropdown] = useState<'create' | 'search' | null>(null)
 
-  // Сторінка, що відповідає поточному маршруту — використовується для
-  // підсвітки пункту меню, коли жодне випадне меню не відкрите.
+  // The page matching the current route — used to highlight the nav item
+  // when no dropdown menu is currently open.
   const activePage: 'create' | 'search' | 'categories' | 'masters' | null =
     pathname?.startsWith('/orders/create') ? 'create'
     : pathname?.startsWith('/orders/search') ? 'search'
@@ -32,18 +32,18 @@ export const Header = () => {
     : pathname?.startsWith('/masters') ? 'masters'
     : null
 
-  // Єдине джерело правди для підсвітки — відкрите меню має пріоритет над
-  // маршрутом, і завжди підсвічений лише один пункт одночасно.
+  // Single source of truth for highlighting — an open menu takes priority
+  // over the route, and only one item is ever highlighted at a time.
   const activeNav = openDropdown ?? activePage
 
-  // Закриваємо відкрите меню при переході на іншу сторінку
+  // Close the open menu when navigating to another page
   useEffect(() => {
     setOpenDropdown(null)
     setMobileMenuOpen(false)
   }, [pathname])
 
-  // Стабільні посилання на колбеки — щоб дочірні дропдауни не перепідписували
-  // свій "клік поза межами" листенер на кожен ре-рендер Header.
+  // Stable callback references — so child dropdowns don't re-subscribe
+  // their "click outside" listener on every Header re-render.
   const handleCreateOpenChange = useCallback((open: boolean) => setOpenDropdown(open ? 'create' : null), [])
   const handleSearchOpenChange = useCallback((open: boolean) => setOpenDropdown(open ? 'search' : null), [])
 
@@ -78,9 +78,9 @@ export const Header = () => {
   const isMaster = user?.role === 'USER_TYPE_MASTER'
   const unreadCount = useUnreadStore((s) => s.unreadOrderIds.size)
 
-  // Лічильник непрочитаних рахуємо тут (а не лише на сторінках "Мої
-  // замовлення"/"Вхідні замовлення"), щоб бейдж у шапці працював на будь-якій
-  // сторінці, а не зникав одразу після заходу деінде чи перезавантаження.
+  // We compute the unread count here (not just on the "My Orders"/"Incoming
+  // Orders" pages) so the badge in the header works on any page, instead of
+  // disappearing as soon as you navigate elsewhere or reload.
   const { data: myOrdersForUnread } = useQuery({
     queryKey: ['my-orders'],
     queryFn: async () => {
@@ -108,8 +108,8 @@ export const Header = () => {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-1.5 sm:gap-2">
-          <span className="text-xl font-bold text-orange-500 sm:text-2xl">Майстер</span>
-          <span className="text-xl font-bold text-gray-800 sm:text-2xl">Онлайн</span>
+          <span className="text-xl font-bold text-orange-500 sm:text-2xl">Master</span>
+          <span className="text-xl font-bold text-gray-800 sm:text-2xl">Online</span>
         </Link>
 
         {/* Nav */}
@@ -125,10 +125,10 @@ export const Header = () => {
             isActive={activeNav === 'search'}
           />
           <Link href="/categories" className={navLinkClass(activeNav === 'categories')}>
-            Категорії
+            Categories
           </Link>
           <Link href="/masters" className={navLinkClass(activeNav === 'masters')}>
-            Майстри
+            Masters
           </Link>
         </nav>
 
@@ -178,7 +178,7 @@ export const Header = () => {
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
                     >
-                      👤 Мій профіль
+                      👤 My Profile
                     </Link>
 
                     <Link
@@ -186,7 +186,7 @@ export const Header = () => {
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center justify-between gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
                     >
-                      <span>📋 Мої замовлення</span>
+                      <span>📋 My Orders</span>
                       {!isMaster && unreadCount > 0 && (
                         <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                           {unreadCount > 9 ? '9+' : unreadCount}
@@ -200,7 +200,7 @@ export const Header = () => {
                         onClick={() => setMenuOpen(false)}
                         className="flex items-center justify-between gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
                       >
-                        <span>📥 Вхідні замовлення</span>
+                        <span>📥 Incoming Orders</span>
                         {unreadCount > 0 && (
                           <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                             {unreadCount > 9 ? '9+' : unreadCount}
@@ -214,7 +214,7 @@ export const Header = () => {
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
                     >
-                      🔍 Пошук замовлень
+                      🔍 Search Orders
                     </Link>
 
                     <Link
@@ -222,7 +222,7 @@ export const Header = () => {
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
                     >
-                      🔔 Сповіщення
+                      🔔 Notifications
                     </Link>
 
                     <Link
@@ -230,7 +230,7 @@ export const Header = () => {
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
                     >
-                      💬 Особисті повідомлення
+                      💬 Messages
                     </Link>
 
                     <Link
@@ -238,7 +238,7 @@ export const Header = () => {
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
                     >
-                      💰 Баланс
+                      💰 Balance
                     </Link>
                   </div>
 
@@ -247,7 +247,7 @@ export const Header = () => {
                       onClick={handleLogout}
                       className="flex w-full items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-50"
                     >
-                      🚪 Вихід
+                      🚪 Log out
                     </button>
                   </div>
                 </div>
@@ -259,19 +259,19 @@ export const Header = () => {
                 href="/login"
                 className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
-                Увійти
+                Log in
               </Link>
               <Link
                 href="/register"
                 className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
               >
-                Реєстрація
+                Sign up
               </Link>
             </div>
           )}
         </div>
 
-        {/* Mobile: компактний аватар + гамбургер замість повного меню */}
+        {/* Mobile: compact avatar + hamburger instead of the full menu */}
         <div className="flex items-center gap-1 md:hidden">
           {_hasHydrated && isAuthenticated() && (
             <Link href="/profile" className="relative shrink-0" onClick={() => setMobileMenuOpen(false)}>
@@ -293,7 +293,7 @@ export const Header = () => {
           )}
           <button
             onClick={() => setMobileMenuOpen((v) => !v)}
-            aria-label={mobileMenuOpen ? 'Закрити меню' : 'Відкрити меню'}
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-50"
           >
             <span className="text-xl leading-none">{mobileMenuOpen ? '✕' : '☰'}</span>
@@ -301,7 +301,7 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* Мобільне випадне меню — усі пункти навігації одним списком, без флайаутів */}
+      {/* Mobile dropdown menu — all nav items in one list, without flyouts */}
       {mobileMenuOpen && (
         <nav className="border-t border-gray-200 bg-white md:hidden">
           <div className="flex flex-col divide-y divide-gray-100">
@@ -309,22 +309,22 @@ export const Header = () => {
               🛠️ Create Order
             </Link>
             <Link href="/orders/search" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-orange-50">
-              🔍 Пошук замовлень
+              🔍 Search Orders
             </Link>
             <Link href="/categories" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-orange-50">
-              📂 Категорії
+              📂 Categories
             </Link>
             <Link href="/masters" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-orange-50">
-              👷 Майстри
+              👷 Masters
             </Link>
 
             {!_hasHydrated ? null : isAuthenticated() ? (
               <>
                 <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm text-gray-700 hover:bg-orange-50">
-                  👤 Мій профіль
+                  👤 My Profile
                 </Link>
                 <Link href="/orders/my" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-orange-50">
-                  <span>📋 Мої замовлення</span>
+                  <span>📋 My Orders</span>
                   {!isMaster && unreadCount > 0 && (
                     <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                       {unreadCount > 9 ? '9+' : unreadCount}
@@ -333,7 +333,7 @@ export const Header = () => {
                 </Link>
                 {isMaster && (
                   <Link href="/orders/incoming" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-orange-50">
-                    <span>📥 Вхідні замовлення</span>
+                    <span>📥 Incoming Orders</span>
                     {unreadCount > 0 && (
                       <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                         {unreadCount > 9 ? '9+' : unreadCount}
@@ -342,19 +342,19 @@ export const Header = () => {
                   </Link>
                 )}
                 <Link href="/notifications" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm text-gray-700 hover:bg-orange-50">
-                  🔔 Сповіщення
+                  🔔 Notifications
                 </Link>
                 <Link href="/messages" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm text-gray-700 hover:bg-orange-50">
-                  💬 Особисті повідомлення
+                  💬 Messages
                 </Link>
                 <Link href="/balance" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm text-gray-700 hover:bg-orange-50">
-                  💰 Баланс
+                  💰 Balance
                 </Link>
                 <button
                   onClick={() => { setMobileMenuOpen(false); handleLogout() }}
                   className="px-4 py-3 text-left text-sm text-red-500 hover:bg-red-50"
                 >
-                  🚪 Вихід
+                  🚪 Log out
                 </button>
               </>
             ) : (
@@ -364,14 +364,14 @@ export const Header = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  Увійти
+                  Log in
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex-1 rounded-lg bg-orange-500 px-4 py-2 text-center text-sm font-medium text-white hover:bg-orange-600"
                 >
-                  Реєстрація
+                  Sign up
                 </Link>
               </div>
             )}

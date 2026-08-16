@@ -24,7 +24,7 @@ export const ProfilePage = () => {
     (searchParams.get('tab') as Tab) ?? 'general'
   )
 
-  // Якщо email ще не підтверджений у store — тихо перевіряємо свіжий стан з API
+  // If email is not yet verified in the store — silently check the fresh state from the API
   useEffect(() => {
     if (!user?.isEmailVerified) {
       userApi.getProfile().then(setUser).catch(() => {})
@@ -37,12 +37,12 @@ export const ProfilePage = () => {
   }
 
   const tabs = [
-    { id: 'general' as Tab, label: 'Загальна інформація' },
+    { id: 'general' as Tab, label: 'General Information' },
     ...(isMaster ? [
-      { id: 'work-types' as Tab, label: 'Типи робіт' },
-      { id: 'prices' as Tab, label: 'Вартість робіт' },
+      { id: 'work-types' as Tab, label: 'Work Types' },
+      { id: 'prices' as Tab, label: 'Work Prices' },
     ] : []),
-    { id: 'password' as Tab, label: 'Зміна паролю' },
+    { id: 'password' as Tab, label: 'Change Password' },
   ]
 
   const setActiveTab = (tab: Tab) => {
@@ -52,16 +52,16 @@ export const ProfilePage = () => {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      {/* Банер неактивованого email */}
+      {/* Unverified email banner */}
       {user && !user.isEmailVerified && (
         <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
           <p className="text-sm font-medium text-yellow-800">
-            ⚠️ Ваш email не підтверджено. Перевірте пошту та перейдіть за посиланням з листа для активації акаунту.
+            ⚠️ Your email is not verified. Check your inbox and follow the link in the email to activate your account.
           </p>
         </div>
       )}
 
-      {/* Header профілю */}
+      {/* Profile header */}
       <div className="mb-6 flex items-center gap-4">
         <div className="flex h-20 w-20 overflow-hidden rounded-full border border-gray-200">
           {user?.avatarUrl ? (
@@ -87,7 +87,7 @@ export const ProfilePage = () => {
         </div>
       </div>
 
-      {/* Вкладки */}
+      {/* Tabs */}
       <div className="mb-6 border-b border-gray-200">
         <div className="flex gap-0 overflow-x-auto">
           {tabs.map((tab) => (
@@ -106,7 +106,7 @@ export const ProfilePage = () => {
         </div>
       </div>
 
-      {/* Контент вкладки */}
+      {/* Tab content */}
       <div>
         <div className={activeTab !== 'general' ? 'hidden' : ''}><GeneralTab /></div>
         {isMaster && (
@@ -118,7 +118,7 @@ export const ProfilePage = () => {
         <div className={activeTab !== 'password' ? 'hidden' : ''}><ChangePasswordTab /></div>
       </div>
 
-      {/* Вийти */}
+      {/* Logout */}
       <div className="mt-8 border-t border-gray-200 pt-6">
         <LogoutButton />
       </div>

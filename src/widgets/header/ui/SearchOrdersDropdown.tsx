@@ -24,9 +24,9 @@ export const SearchOrdersDropdown = ({ isOpen, onOpenChange, isActive }: Props) 
   })
 
   useEffect(() => {
-    // Якщо це меню зараз закрите — не реагуємо на зовнішній клік, інакше
-    // клік усередині ІНШОГО (сусіднього) відкритого дропдауна теж потрапляє
-    // сюди як "зовнішній" і скидає спільний стан, закриваючи той дропдаун.
+    // If this menu is currently closed, ignore outside clicks — otherwise
+    // a click inside ANOTHER (sibling) open dropdown would also land here
+    // as an "outside" click and reset the shared state, closing that dropdown.
     if (!isOpen) return
     const handleClickOutside = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
@@ -47,7 +47,7 @@ export const SearchOrdersDropdown = ({ isOpen, onOpenChange, isActive }: Props) 
             : 'border-transparent text-gray-600 hover:text-orange-500'
         }`}
       >
-        Пошук замовлень
+        Search Orders
         <span className={`text-xs transition-transform ${isOpen ? 'rotate-180' : ''}`}>▾</span>
       </button>
 
@@ -59,7 +59,7 @@ export const SearchOrdersDropdown = ({ isOpen, onOpenChange, isActive }: Props) 
               onClick={() => onOpenChange(false)}
               className="block px-4 py-2.5 text-left text-sm font-medium text-orange-600 hover:bg-orange-50 border-b border-gray-100"
             >
-              🔍 Всі замовлення
+              🔍 All Orders
             </Link>
             {categoriesData?.map((category: any) => (
               <Link

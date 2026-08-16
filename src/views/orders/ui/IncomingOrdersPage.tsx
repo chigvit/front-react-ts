@@ -16,11 +16,11 @@ import { markAsRead } from '@/shared/lib/unreadMessages'
 import { getSeenOrderIds, markOrderSeen } from '@/shared/lib/seenOrders'
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'info' }> = {
-  OPEN:        { label: 'Очікує рішення замовника', variant: 'warning' },
-  PENDING:     { label: 'Очікує відповіді', variant: 'warning' },
-  IN_PROGRESS: { label: 'В роботі',         variant: 'success' },
-  COMPLETED:   { label: 'Виконано',          variant: 'info' },
-  CANCELLED:   { label: 'Скасовано',         variant: 'danger' },
+  OPEN:        { label: 'Awaiting customer decision', variant: 'warning' },
+  PENDING:     { label: 'Awaiting Response', variant: 'warning' },
+  IN_PROGRESS: { label: 'In Progress',       variant: 'success' },
+  COMPLETED:   { label: 'Completed',         variant: 'info' },
+  CANCELLED:   { label: 'Cancelled',         variant: 'danger' },
 }
 
 export const IncomingOrdersPage = () => {
@@ -38,10 +38,10 @@ export const IncomingOrdersPage = () => {
     enabled: _hasHydrated && isAuthenticated(),
   })
 
-  // Замовлення, на які майстер відгукнувся через "Пошук замовлень", але
-  // замовник ще не прийняв відгук — orders.master_id ще порожній, тож
-  // /orders/incoming їх не бачить. Дістаємо окремо, щоб переписка з ними
-  // теж була видна тут, а не лише в пошуку.
+  // Orders the master responded to via "Order Search", but the customer
+  // hasn't accepted the response yet — orders.master_id is still empty, so
+  // /orders/incoming doesn't see them. Fetched separately so the chat with
+  // them is also visible here, not only in search.
   const { data: publicOpenOrders } = useQuery({
     queryKey: ['public-open-orders'],
     queryFn: async () => {
@@ -135,7 +135,7 @@ export const IncomingOrdersPage = () => {
   const removeUnread = useUnreadStore((s) => s.removeUnread)
   const addUnread = useUnreadStore((s) => s.addUnread)
 
-  // Нові вхідні замовлення (ще не переглянуті) → підсвічуємо як непрочитані
+  // New incoming orders (not yet viewed) → highlight as unread
   useEffect(() => {
     if (!ordersData) return
     const seen = getSeenOrderIds()
@@ -146,8 +146,8 @@ export const IncomingOrdersPage = () => {
     }
   }, [ordersData, addUnread])
 
-  // Замовлення з непрочитаним повідомленням розгортаємо одразу — без
-  // додаткового кліку "Деталі" — і одразу позначаємо прочитаним.
+  // Orders with an unread message are expanded immediately — without
+  // an extra click on "Details" — and marked as read right away.
   const autoExpandedRef = useRef(false)
   useEffect(() => {
     if (autoExpandedRef.current || combinedOrders.length === 0 || unreadOrderIds.size === 0) return
@@ -201,14 +201,14 @@ export const IncomingOrdersPage = () => {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold text-gray-800">Вхідні замовлення</h1>
+      <h1 className="mb-6 text-2xl font-bold text-gray-800">Incoming Orders</h1>
 
       {combinedOrders.length === 0 ? (
         <div className="rounded-xl border border-gray-200 bg-white p-12 text-center">
           <div className="mb-4 text-5xl">📭</div>
-          <p className="text-gray-500">Немає нових замовлень.</p>
+          <p className="text-gray-500">No new orders.</p>
           <Link href="/categories" className="mt-4 inline-block text-orange-500 hover:underline">
-            Переглянути категорії →
+            Browse categories →
           </Link>
         </div>
       ) : (
@@ -227,7 +227,7 @@ export const IncomingOrdersPage = () => {
                 key={order.id}
                 className={`rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-md ${hasUnread && !isExpanded ? 'border-orange-300 ring-1 ring-orange-200' : 'border-gray-200'}`}
               >
-                {/* Заголовок картки — завжди видимий */}
+                {/* Card header — always visible */}
                 <div className="p-5">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -239,7 +239,7 @@ export const IncomingOrdersPage = () => {
                         {order.description}
                       </p>
 
-                      {/* Замовник */}
+                      {/* Customer */}
                       {(() => {
                         const customer = customerMap[order.customer_id]
                         if (!customer) return null
@@ -258,7 +258,7 @@ export const IncomingOrdersPage = () => {
                               </div>
                             )}
                             <span className="text-sm text-gray-500">
-                              Замовник: <span className="font-medium text-gray-700">{displayName}</span>
+                              Customer: <span className="font-medium text-gray-700">{displayName}</span>
                             </span>
                           </div>
                         )
@@ -272,7 +272,7 @@ export const IncomingOrdersPage = () => {
                         )}
                         {order.address && <span>📍 {order.address}</span>}
                         {order.budget > 0 && <span>💰 £{order.budget}</span>}
-                        <span>🕐 {new Date(order.created_at).toLocaleDateString('uk-UA')}</span>
+                        <span>🕐 {new Date(order.created_at).toLocaleDateString('en-GB')}</span>
                       </div>
                     </div>
 
@@ -296,19 +296,19 @@ export const IncomingOrdersPage = () => {
                           !
                         </span>
                       )}
-                      {isExpanded ? '▲ Згорнути' : '▼ Деталі'}
+                      {isExpanded ? '▲ Collapse' : '▼ Details'}
                     </button>
                   </div>
                 </div>
 
-                {/* Розгорнута секція */}
+                {/* Expanded section */}
                 {isExpanded && (
                   <div className="border-t border-gray-100 px-5 pb-5">
                     <div className="pt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm">
                       {order.work_type_id > 0 && (
                         <div className="flex items-center gap-2 text-gray-600">
                           <span>🔧</span>
-                          <span>Послуга: <span className="font-medium text-gray-800">
+                          <span>Service: <span className="font-medium text-gray-800">
                             {workTypeMap[order.work_type_id] ?? `#${order.work_type_id}`}
                           </span></span>
                         </div>
@@ -317,31 +317,31 @@ export const IncomingOrdersPage = () => {
                       {order.budget > 0 && (
                         <div className="flex items-center gap-2 text-gray-600">
                           <span>💰</span>
-                          <span>Бюджет: <span className="font-medium text-gray-800">£{order.budget}</span></span>
+                          <span>Budget: <span className="font-medium text-gray-800">£{order.budget}</span></span>
                         </div>
                       )}
 
                       {order.final_price > 0 && (
                         <div className="flex items-center gap-2 text-gray-600">
                           <span>✅</span>
-                          <span>Погоджена ціна: <span className="font-medium text-green-600">£{order.final_price}</span></span>
+                          <span>Agreed price: <span className="font-medium text-green-600">£{order.final_price}</span></span>
                         </div>
                       )}
 
                       <div className="flex items-center gap-2 text-gray-600">
                         <span>🕐</span>
-                        <span>Отримано: <span className="font-medium text-gray-800">
-                          {new Date(order.created_at).toLocaleString('uk-UA')}
+                        <span>Received: <span className="font-medium text-gray-800">
+                          {new Date(order.created_at).toLocaleString('en-GB')}
                         </span></span>
                       </div>
 
                       {order.scheduled_at && (
                         <div className="flex items-center gap-2 text-gray-600">
                           <span>📅</span>
-                          <span>Дата виконання: <span className="font-medium text-gray-800">
-                            {new Date(order.scheduled_at.slice(0, 10) + 'T12:00:00').toLocaleDateString('uk-UA')}
+                          <span>Scheduled date: <span className="font-medium text-gray-800">
+                            {new Date(order.scheduled_at.slice(0, 10) + 'T12:00:00').toLocaleDateString('en-GB')}
                             {order.scheduled_to && (
-                              <> — {new Date(order.scheduled_to.slice(0, 10) + 'T12:00:00').toLocaleDateString('uk-UA')}</>
+                              <> — {new Date(order.scheduled_to.slice(0, 10) + 'T12:00:00').toLocaleDateString('en-GB')}</>
                             )}
                           </span></span>
                         </div>
@@ -350,18 +350,18 @@ export const IncomingOrdersPage = () => {
                       {order.address && (
                         <div className="flex items-center gap-2 text-gray-600">
                           <span>📍</span>
-                          <span>Адреса: <span className="font-medium text-gray-800">{order.address}</span></span>
+                          <span>Address: <span className="font-medium text-gray-800">{order.address}</span></span>
                         </div>
                       )}
                     </div>
 
-                    {/* Контактні дані замовника якщо він поділився */}
+                    {/* Customer contact details if shared */}
                     {isInProgress && (
                       <div className="mt-4 border-t border-gray-100 pt-4">
-                        <p className="mb-3 text-sm font-medium text-green-600">✅ Вас прийняли до виконання</p>
+                        <p className="mb-3 text-sm font-medium text-green-600">✅ You have been accepted for this job</p>
                         {order.customer_phone ? (
                           <div className="mb-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3">
-                            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-green-600">Контакти замовника</p>
+                            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-green-600">Customer Contacts</p>
                             <p className="text-sm font-medium text-gray-800">📞 {order.customer_phone}</p>
                           </div>
                         ) : (
@@ -371,32 +371,32 @@ export const IncomingOrdersPage = () => {
                               disabled={shareContactMutation.isPending}
                               className="mb-3 w-full rounded-lg border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-medium text-orange-600 hover:bg-orange-100 transition-colors disabled:opacity-50"
                             >
-                              🤝 Надати доступ до моїх контактних даних
+                              🤝 Share my contact details
                             </button>
                           )
                         )}
                         {order.master_shared_contact && !order.customer_phone && (
-                          <p className="mb-3 text-xs text-gray-400">✅ Ви надали доступ до своїх контактів. Очікуйте відповіді замовника.</p>
+                          <p className="mb-3 text-xs text-gray-400">✅ You have shared access to your contacts. Waiting for the customer's response.</p>
                         )}
                       </div>
                     )}
 
-                    {/* Ще не прийнятий відгук — переписка вже можлива, але рішення ще за замовником */}
+                    {/* Response not yet accepted — chat is already possible, but the decision is still the customer's */}
                     {isPendingResponse && (
                       <div className="mt-4 border-t border-gray-100 pt-4">
-                        <p className="mb-3 text-sm text-gray-500">Ви залишили відгук на це замовлення, очікуйте рішення замовника:</p>
+                        <p className="mb-3 text-sm text-gray-500">You left a response on this order, waiting for the customer's decision:</p>
                         <OrderChat orderId={order.id} myRole="master" leadingMessage={order._myResponseMessage} />
                       </div>
                     )}
 
-                    {/* Чат доступний як тільки є пропозиція */}
+                    {/* Chat is available as soon as there's an offer */}
                     {(isPending || isInProgress) && (
                       <div className="mt-4 border-t border-gray-100 pt-4">
                         <OrderChat orderId={order.id} myRole="master" />
                       </div>
                     )}
 
-                    {/* Кнопки прийняти / відхилити */}
+                    {/* Accept / reject buttons */}
                     {isPending && (
                       <div className="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-4">
                         <button
@@ -404,19 +404,19 @@ export const IncomingOrdersPage = () => {
                           disabled={isBusy}
                           className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors disabled:opacity-50"
                         >
-                          {acceptMutation.isPending ? 'Приймаємо...' : 'Прийняти замовлення'}
+                          {acceptMutation.isPending ? 'Accepting...' : 'Accept Order'}
                         </button>
                         <button
                           onClick={() => rejectMutation.mutate(order.id)}
                           disabled={isBusy}
                           className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
                         >
-                          {rejectMutation.isPending ? 'Відхиляємо...' : 'Відхилити'}
+                          {rejectMutation.isPending ? 'Rejecting...' : 'Reject'}
                         </button>
                       </div>
                     )}
 
-                    {/* Кнопка Виконано для майстра */}
+                    {/* Complete button for the master */}
                     {isInProgress && (
                       <div className="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-4">
                         <button
@@ -424,14 +424,14 @@ export const IncomingOrdersPage = () => {
                           disabled={completeMutation.isPending}
                           className="rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 transition-colors disabled:opacity-50"
                         >
-                          {completeMutation.isPending ? 'Завершуємо...' : '✅ Виконано'}
+                          {completeMutation.isPending ? 'Completing...' : '✅ Completed'}
                         </button>
                       </div>
                     )}
 
                     {order.status === 'COMPLETED' && (
                       <div className="mt-4 border-t border-gray-100 pt-4">
-                        <RateUserForm ratedId={order.customer_id} label="замовника" />
+                        <RateUserForm ratedId={order.customer_id} label="the customer" />
                       </div>
                     )}
                   </div>

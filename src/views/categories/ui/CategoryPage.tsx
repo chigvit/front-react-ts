@@ -85,7 +85,7 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
       </div>
 
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
-        {/* Sidebar — типи робіт */}
+        {/* Sidebar — work types */}
         <div className="w-full lg:w-64 lg:shrink-0">
           <div className="rounded-xl border border-gray-200 bg-white p-4">
             <div className="mb-4 flex items-center gap-2">
@@ -163,7 +163,7 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
                       className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
                     >
                       <div className="flex gap-4">
-                        {/* Аватар */}
+                        {/* Avatar */}
                         <div className="flex h-16 w-16 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-orange-100">
                           {master.avatar_url ? (
                             <img

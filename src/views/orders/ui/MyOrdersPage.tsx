@@ -18,11 +18,11 @@ import { markAsRead } from '@/shared/lib/unreadMessages'
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'info' }> = {
-  OPEN:        { label: 'Відкрите',         variant: 'info' },
-  IN_PROGRESS: { label: 'В роботі',         variant: 'success' },
-  COMPLETED:   { label: 'Виконано',          variant: 'info' },
-  CANCELLED:   { label: 'Скасовано',         variant: 'danger' },
-  PENDING:     { label: 'Очікує відповіді', variant: 'warning' },
+  OPEN:        { label: 'Open',              variant: 'info' },
+  IN_PROGRESS: { label: 'In Progress',       variant: 'success' },
+  COMPLETED:   { label: 'Completed',         variant: 'info' },
+  CANCELLED:   { label: 'Cancelled',         variant: 'danger' },
+  PENDING:     { label: 'Awaiting Response', variant: 'warning' },
 }
 
 export const MyOrdersPage = () => {
@@ -101,8 +101,8 @@ export const MyOrdersPage = () => {
   const unreadOrderIds = useUnreadStore((s) => s.unreadOrderIds)
   const removeUnread = useUnreadStore((s) => s.removeUnread)
 
-  // Замовлення з непрочитаним повідомленням розгортаємо одразу — без
-  // додаткового кліку "Деталі" — і одразу позначаємо прочитаним.
+  // Orders with an unread message are expanded immediately — without
+  // an extra click on "Details" — and marked as read right away.
   const autoExpandedRef = useRef(false)
   useEffect(() => {
     if (autoExpandedRef.current || !ordersData || unreadOrderIds.size === 0) return
@@ -141,7 +141,7 @@ export const MyOrdersPage = () => {
       queryClient.invalidateQueries({ queryKey: ['order-responses', orderId] })
     },
     onError: (error: any) => {
-      setResponseError(error?.response?.data?.error ?? 'Не вдалося прийняти відгук')
+      setResponseError(error?.response?.data?.error ?? 'Failed to accept response')
     },
   })
 
@@ -162,19 +162,19 @@ export const MyOrdersPage = () => {
   const firstOrder = ordersData?.[0] ?? null
   const sidebarWorkTypeId = (expandedOrder ?? firstOrder)?.work_type_id ?? 0
   const proposableOrderId = expandedOrder?.status === 'OPEN' ? expandedOrder.id : null
-  // Якщо розгорнуто замовлення не в статусі OPEN — ховаємо кнопку "Запропонувати"
+  // If the expanded order is not in OPEN status — hide the "Propose" button
   const hidePropose = expandedOrder != null && expandedOrder.status !== 'OPEN'
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold text-gray-800">Мої замовлення</h1>
+      <h1 className="mb-6 text-2xl font-bold text-gray-800">My Orders</h1>
 
       {ordersData?.length === 0 ? (
         <div className="rounded-xl border border-gray-200 bg-white p-12 text-center">
           <div className="mb-4 text-5xl">📋</div>
-          <p className="text-gray-500">У вас ще немає жодного замовлення.</p>
+          <p className="text-gray-500">You don't have any orders yet.</p>
           <Link href="/categories" className="mt-4 inline-block text-orange-500 hover:underline">
-            Переглянути послуги →
+            Browse services →
           </Link>
         </div>
       ) : (
@@ -199,14 +199,14 @@ export const MyOrdersPage = () => {
                           <h2 className="text-lg font-semibold text-gray-800">{order.title}</h2>
                           <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
                           {order.order_type === 'DIRECT' && (
-                            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">🎯 Пряме</span>
+                            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">🎯 Direct</span>
                           )}
                         </div>
                         <p className={`text-sm text-gray-600 ${isExpanded ? '' : 'line-clamp-2'}`}>
                           {order.description}
                         </p>
 
-                        {/* Виконавець */}
+                        {/* Master */}
                         {order.master_id && (() => {
                           const master = masterMap[order.master_id]
                           if (!master) return null
@@ -228,7 +228,7 @@ export const MyOrdersPage = () => {
                                 </div>
                               )}
                               <span className="text-sm text-gray-500">
-                                Виконавець: <span className="font-medium text-gray-700 hover:underline">{displayName}</span>
+                                Master: <span className="font-medium text-gray-700 hover:underline">{displayName}</span>
                               </span>
                             </Link>
                           )
@@ -242,7 +242,7 @@ export const MyOrdersPage = () => {
                           )}
                           {order.address && <span>📍 {order.address}</span>}
                           {order.budget > 0 && <span>💰 £{order.budget}</span>}
-                          <span>🕐 {new Date(order.created_at).toLocaleDateString('uk-UA')}</span>
+                          <span>🕐 {new Date(order.created_at).toLocaleDateString('en-GB')}</span>
                         </div>
                       </div>
 
@@ -265,7 +265,7 @@ export const MyOrdersPage = () => {
                             !
                           </span>
                         )}
-                        {isExpanded ? '▲ Згорнути' : '▼ Деталі'}
+                        {isExpanded ? '▲ Collapse' : '▼ Details'}
                       </button>
                     </div>
                   </div>
@@ -276,15 +276,15 @@ export const MyOrdersPage = () => {
                       <div className="pt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm">
                         <div className="flex items-center gap-2 text-gray-600">
                           <span>📋</span>
-                          <span>Тип: <span className="font-medium text-gray-800">
-                            {order.order_type === 'DIRECT' ? '🎯 Пряме' : '🌐 Відкрите'}
+                          <span>Type: <span className="font-medium text-gray-800">
+                            {order.order_type === 'DIRECT' ? '🎯 Direct' : '🌐 Open'}
                           </span></span>
                         </div>
 
                         {order.work_type_id > 0 && (
                           <div className="flex items-center gap-2 text-gray-600">
                             <span>🔧</span>
-                            <span>Послуга: <span className="font-medium text-gray-800">
+                            <span>Service: <span className="font-medium text-gray-800">
                               {workTypeMap[order.work_type_id] ?? `#${order.work_type_id}`}
                             </span></span>
                           </div>
@@ -293,24 +293,24 @@ export const MyOrdersPage = () => {
                         {order.final_price > 0 && (
                           <div className="flex items-center gap-2 text-gray-600">
                             <span>✅</span>
-                            <span>Погоджена ціна: <span className="font-medium text-green-600">£{order.final_price}</span></span>
+                            <span>Agreed price: <span className="font-medium text-green-600">£{order.final_price}</span></span>
                           </div>
                         )}
 
                         <div className="flex items-center gap-2 text-gray-600">
                           <span>🕐</span>
-                          <span>Створено: <span className="font-medium text-gray-800">
-                            {new Date(order.created_at).toLocaleString('uk-UA')}
+                          <span>Created: <span className="font-medium text-gray-800">
+                            {new Date(order.created_at).toLocaleString('en-GB')}
                           </span></span>
                         </div>
 
                         {order.scheduled_at && (
                           <div className="flex items-center gap-2 text-gray-600">
                             <span>📅</span>
-                            <span>Дата виконання: <span className="font-medium text-gray-800">
-                              {new Date(order.scheduled_at.slice(0, 10) + 'T12:00:00').toLocaleDateString('uk-UA')}
+                            <span>Scheduled date: <span className="font-medium text-gray-800">
+                              {new Date(order.scheduled_at.slice(0, 10) + 'T12:00:00').toLocaleDateString('en-GB')}
                               {order.scheduled_to && (
-                                <> — {new Date(order.scheduled_to.slice(0, 10) + 'T12:00:00').toLocaleDateString('uk-UA')}</>
+                                <> — {new Date(order.scheduled_to.slice(0, 10) + 'T12:00:00').toLocaleDateString('en-GB')}</>
                               )}
                             </span></span>
                           </div>
@@ -319,18 +319,18 @@ export const MyOrdersPage = () => {
                         {order.completed_at && (
                           <div className="flex items-center gap-2 text-gray-600">
                             <span>🏁</span>
-                            <span>Виконано: <span className="font-medium text-gray-800">
-                              {new Date(order.completed_at).toLocaleString('uk-UA')}
+                            <span>Completed: <span className="font-medium text-gray-800">
+                              {new Date(order.completed_at).toLocaleString('en-GB')}
                             </span></span>
                           </div>
                         )}
                       </div>
 
-                      {/* Відгуки майстрів — доки замовлення відкрите й виконавця ще не обрано */}
+                      {/* Master responses — while the order is open and a master hasn't been chosen yet */}
                       {order.status === 'OPEN' && (
                         <div className="mt-4 border-t border-gray-100 pt-4">
                           <h3 className="mb-3 text-sm font-semibold text-gray-800">
-                            Відгуки майстрів
+                            Master Responses
                             {responsesData?.length > 0 && (
                               <span className="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-600">
                                 {responsesData.length}
@@ -343,7 +343,7 @@ export const MyOrdersPage = () => {
                               <Spinner size="md" />
                             </div>
                           ) : !responsesData || responsesData.length === 0 ? (
-                            <p className="text-sm text-gray-400">Поки що немає відгуків від майстрів</p>
+                            <p className="text-sm text-gray-400">No responses from masters yet</p>
                           ) : (
                             <div className="flex flex-col gap-2">
                               {responsesData.map((resp: any) => {
@@ -374,9 +374,9 @@ export const MyOrdersPage = () => {
                                             </div>
                                           )}
                                           <span className="text-sm font-medium text-gray-700 hover:underline">
-                                            {displayName ?? 'Майстер'}
+                                            {displayName ?? 'Master'}
                                           </span>
-                                          {resp.is_accepted && <Badge variant="success">✓ Прийнято</Badge>}
+                                          {resp.is_accepted && <Badge variant="success">✓ Accepted</Badge>}
                                         </Link>
                                         {resp.message && (
                                           <p className="mt-1 text-sm text-gray-600">{resp.message}</p>
@@ -393,7 +393,7 @@ export const MyOrdersPage = () => {
                                             disabled={acceptResponseMutation.isPending}
                                             className="rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-600 transition-colors disabled:opacity-50"
                                           >
-                                            Прийняти
+                                            Accept
                                           </button>
                                         )}
                                         <button
@@ -402,7 +402,7 @@ export const MyOrdersPage = () => {
                                           )}
                                           className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
                                         >
-                                          {openReplyResponseId === resp.id ? 'Згорнути' : 'Відповісти'}
+                                          {openReplyResponseId === resp.id ? 'Collapse' : 'Reply'}
                                         </button>
                                       </div>
                                     </div>
@@ -423,12 +423,12 @@ export const MyOrdersPage = () => {
                         </div>
                       )}
 
-                      {/* Контактні дані виконавця якщо він поділився */}
+                      {/* Master contact details if shared */}
                       {order.master_id && order.status === 'IN_PROGRESS' && (
                         <div className="mt-4 border-t border-gray-100 pt-4">
                           {order.master_phone ? (
                             <div className="mb-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3">
-                              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-green-600">Контакти виконавця</p>
+                              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-green-600">Master Contacts</p>
                               <p className="text-sm font-medium text-gray-800">📞 {order.master_phone}</p>
                             </div>
                           ) : (
@@ -438,17 +438,17 @@ export const MyOrdersPage = () => {
                                 disabled={shareContactMutation.isPending}
                                 className="mb-3 w-full rounded-lg border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-medium text-orange-600 hover:bg-orange-100 transition-colors disabled:opacity-50"
                               >
-                                🤝 Надати доступ до моїх контактних даних
+                                🤝 Share my contact details
                               </button>
                             )
                           )}
                           {order.customer_shared_contact && !order.master_phone && (
-                            <p className="mb-3 text-xs text-gray-400">✅ Ви надали доступ до своїх контактів. Очікуйте відповіді виконавця.</p>
+                            <p className="mb-3 text-xs text-gray-400">✅ You have shared access to your contacts. Waiting for the master's response.</p>
                           )}
                         </div>
                       )}
 
-                      {/* Чат доступний як тільки є виконавець */}
+                      {/* Chat is available as soon as there's a master */}
                       {order.master_id && (order.status === 'PENDING' || order.status === 'IN_PROGRESS') && (
                         <div className="mt-4 border-t border-gray-100 pt-4">
                           <OrderChat orderId={order.id} myRole="customer" />
@@ -461,7 +461,7 @@ export const MyOrdersPage = () => {
                             href={`/orders/${order.id}/edit`}
                             className="rounded-lg border border-orange-200 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors"
                           >
-                            Редагувати
+                            Edit
                           </Link>
                         )}
                         {order.status === 'IN_PROGRESS' && (
@@ -470,7 +470,7 @@ export const MyOrdersPage = () => {
                             disabled={completeMutation.isPending}
                             className="rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 transition-colors disabled:opacity-50"
                           >
-                            {completeMutation.isPending ? 'Завершуємо...' : '✅ Виконано'}
+                            {completeMutation.isPending ? 'Completing...' : '✅ Completed'}
                           </button>
                         )}
                         {(order.status === 'OPEN' || order.status === 'PENDING') && (
@@ -479,14 +479,14 @@ export const MyOrdersPage = () => {
                             disabled={cancelMutation.isPending}
                             className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
                           >
-                            {cancelMutation.isPending ? 'Скасовуємо...' : 'Скасувати'}
+                            {cancelMutation.isPending ? 'Cancelling...' : 'Cancel'}
                           </button>
                         )}
                       </div>
 
                       {order.status === 'COMPLETED' && order.master_id && (
                         <div className="mt-4 border-t border-gray-100 pt-4">
-                          <RateUserForm ratedId={order.master_id} label="виконавця" />
+                          <RateUserForm ratedId={order.master_id} label="the master" />
                         </div>
                       )}
                     </div>

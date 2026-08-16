@@ -14,7 +14,7 @@ import { AvatarUpload } from './AvatarUpload'
 import { useState, useEffect } from 'react'
 
 const LANGUAGES = [
-  'English / Англійська',
+  'English',
   'Welsh / Cymraeg',
   'Scottish Gaelic / Gàidhlig',
   'Irish / Gaeilge',
@@ -42,8 +42,8 @@ const LANGUAGES = [
 const RADIUS_OPTIONS = [5, 10, 20, 50, 100]
 
 const schema = z.object({
-  firstName: z.string().min(2, 'Мінімум 2 символи'),
-  lastName: z.string().min(2, 'Мінімум 2 символи'),
+  firstName: z.string().min(2, 'Minimum 2 characters'),
+  lastName: z.string().min(2, 'Minimum 2 characters'),
   phone: z.string().optional(),
   postcode: z.string().optional(),
   bio: z.string().optional(),
@@ -74,7 +74,7 @@ export const GeneralTab = () => {
   if (profile?.languages && profile.languages.length > 0) {
     setSelectedLanguages(profile.languages)
   } else {
-    setSelectedLanguages(['English / Англійська'])
+    setSelectedLanguages(['English'])
   }
 }, [profile])
 
@@ -122,24 +122,24 @@ export const GeneralTab = () => {
   return (
     <form onSubmit={handleSubmit((data) => updateProfile({ ...data, languages: selectedLanguages }))} className="flex flex-col gap-6">
 
-      {/* Аватар */}
+      {/* Avatar */}
 <div className="rounded-xl border border-gray-200 bg-white p-6">
-  <h2 className="mb-4 font-semibold text-gray-800">Фото профілю</h2>
+  <h2 className="mb-4 font-semibold text-gray-800">Profile Photo</h2>
   <AvatarUpload />
 </div>
 
-{/* Контактні дані */}
+{/* Contact details */}
       <div className="rounded-xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 font-semibold text-gray-800">Контактні дані</h2>
+        <h2 className="mb-4 font-semibold text-gray-800">Contact Details</h2>
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Ім'я"
+              label="First Name"
               error={errors.firstName?.message}
               {...register('firstName')}
             />
             <Input
-              label="Прізвище"
+              label="Last Name"
               error={errors.lastName?.message}
               {...register('lastName')}
             />
@@ -155,16 +155,16 @@ export const GeneralTab = () => {
           </div>
 
           <Input
-            label="Телефон"
-            placeholder="+380671234567"
+            label="Phone"
+            placeholder="+447911123456"
             {...register('phone')}
           />
         </div>
       </div>
 
-      {/* Мови */}
+      {/* Languages */}
       <div className="rounded-xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 font-semibold text-gray-800">Мови спілкування</h2>
+        <h2 className="mb-4 font-semibold text-gray-800">Languages Spoken</h2>
         <div className="flex flex-wrap gap-2">
           {LANGUAGES.map((lang) => (
             <button
@@ -183,20 +183,20 @@ export const GeneralTab = () => {
         </div>
       </div>
 
-      {/* Адреса та локація */}
+      {/* Address & Location */}
       <div className="rounded-xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 font-semibold text-gray-800">Адреса та локація</h2>
+        <h2 className="mb-4 font-semibold text-gray-800">Address & Location</h2>
         <div className="flex flex-col gap-4">
           <Input
-            label="Поштовий індекс / місто"
-            placeholder="01001 або Київ"
+            label="Postcode / City"
+            placeholder="SW1A 1AA or London"
             {...register('postcode')}
           />
 
           {isMaster && (
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
-                Радіус роботи (милі)
+                Work Radius (miles)
               </label>
               <div className="flex gap-2">
                 {RADIUS_OPTIONS.map((radius) => (
@@ -210,7 +210,7 @@ export const GeneralTab = () => {
                         : 'border-gray-300 text-gray-600 hover:border-orange-300'
                     }`}
                   >
-                    {radius} миль
+                    {radius} miles
                   </button>
                 ))}
               </div>
@@ -219,23 +219,23 @@ export const GeneralTab = () => {
         </div>
       </div>
 
-      {/* Про себе (майстер) */}
+      {/* About (master) */}
       {isMaster && (
         <div className="rounded-xl border border-gray-200 bg-white p-6">
-          <h2 className="mb-4 font-semibold text-gray-800">Про себе</h2>
+          <h2 className="mb-4 font-semibold text-gray-800">About</h2>
           <div className="flex flex-col gap-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Опис послуг</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Service Description</label>
               <textarea
                 className="w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-orange-500"
                 rows={4}
-                placeholder="Розкажіть про свій досвід та послуги..."
+                placeholder="Tell us about your experience and services..."
                 {...register('bio')}
               />
             </div>
 
             <Input
-              label="Досвід роботи (років)"
+              label="Years of Experience"
               type="number"
               {...register('experienceYears', { valueAsNumber: true })}
             />
@@ -243,7 +243,7 @@ export const GeneralTab = () => {
             {profile?.masterProfile && profile.masterProfile.reviewsCount > 0 && (
               <div className="rounded-lg bg-orange-50 p-4">
                 <p className="text-sm text-orange-800">
-                  ⭐ Рейтинг: <strong>{profile.masterProfile.rating}</strong> ({profile.masterProfile.reviewsCount} відгуків)
+                  ⭐ Rating: <strong>{profile.masterProfile.rating}</strong> ({profile.masterProfile.reviewsCount} reviews)
                 </p>
               </div>
             )}
@@ -251,14 +251,14 @@ export const GeneralTab = () => {
         </div>
       )}
 
-      {/* Налаштування повідомлень */}
+      {/* Notification settings */}
       <div className="rounded-xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 font-semibold text-gray-800">Налаштування повідомлень</h2>
+        <h2 className="mb-4 font-semibold text-gray-800">Notification Settings</h2>
         <div className="flex flex-col gap-3">
           {[
-            { label: 'Email повідомлення про зміни статусів замовлень' },
-            { label: 'Розсилка нових замовлень' },
-            { label: 'SMS повідомлення про важливі події' },
+            { label: 'Email notifications about order status changes' },
+            { label: 'New order notifications' },
+            { label: 'SMS notifications about important events' },
           ].map((item, i) => (
             <label key={i} className="flex cursor-pointer items-center gap-3">
               <input
@@ -273,11 +273,11 @@ export const GeneralTab = () => {
       </div>
 
       {saved && (
-        <p className="text-sm text-green-600">✅ Профіль збережено!</p>
+        <p className="text-sm text-green-600">✅ Profile saved!</p>
       )}
 
       <Button type="submit" loading={isPending} className="w-full md:w-auto">
-        Зберегти зміни
+        Save Changes
       </Button>
     </form>
   )

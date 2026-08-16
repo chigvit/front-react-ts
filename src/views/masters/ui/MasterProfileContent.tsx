@@ -10,9 +10,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
 interface Props {
   masterId: string
-  // Ховати "Hero"-блок (аватар/ім'я/локація/рейтинг) — коли контент
-  // вставляється inline під карткою майстра, яка вже показує ці самі дані,
-  // щоб не дублювати їх.
+  // Hide the "Hero" block (avatar/name/location/rating) — when the content
+  // is inserted inline under a master's card that already shows this same data,
+  // so as not to duplicate it.
   showHero?: boolean
 }
 
@@ -42,9 +42,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-// Повний вміст профілю майстра — без шапки сторінки (фон/"Назад"), щоб можна
-// було вставляти і як окрему сторінку (/masters/[id]), і inline (розгортання
-// картки майстра в списку, без переходу на іншу сторінку).
+// Full master profile content — without the page header (background/"Back"), so it
+// can be inserted both as a standalone page (/masters/[id]) and inline (expanding
+// a master's card in the list, without navigating to another page).
 export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
   const [ordersOpen, setOrdersOpen] = useState(false)
 
@@ -103,7 +103,7 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
   if (!profile) {
     return (
       <div className="py-8 text-center text-gray-500">
-        Профіль не знайдено.
+        Profile not found.
       </div>
     )
   }
@@ -143,7 +143,7 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
                 </h1>
                 {mp?.is_verified && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-green-200">
-                    ✓ Верифіковано
+                    ✓ Verified
                   </span>
                 )}
               </div>
@@ -152,9 +152,9 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
               <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
                 {profile.postcode && <span>📍 {profile.postcode}</span>}
                 {mp?.experience_years > 0 && (
-                  <span>🛠 {mp.experience_years} р. досвіду</span>
+                  <span>🛠 {mp.experience_years} yrs experience</span>
                 )}
-                {mp?.radius_miles > 0 && <span>🚗 до {mp.radius_miles} миль</span>}
+                {mp?.radius_miles > 0 && <span>🚗 up to {mp.radius_miles} miles</span>}
               </div>
 
               {/* Rating row */}
@@ -163,7 +163,7 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
                   <StarRating value={avgRating} />
                   <span className="text-sm font-bold text-gray-800">{avgRating > 0 ? avgRating.toFixed(1) : '—'}</span>
                   {ratings.length > 0 && (
-                    <span className="text-sm text-gray-400">{ratings.length} відгуків</span>
+                    <span className="text-sm text-gray-400">{ratings.length} reviews</span>
                   )}
                 </div>
               )}
@@ -189,9 +189,9 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
         {/* Left column */}
         <div className="flex-1 min-w-0 rounded-2xl bg-white px-6 shadow-sm">
 
-          {/* Про себе */}
+          {/* About */}
           {(mp?.bio || mp?.services_description) && (
-            <Section title="Про майстра">
+            <Section title="About the Master">
               {mp?.bio && <p className="text-sm leading-relaxed text-gray-600">{mp.bio}</p>}
               {mp?.bio && mp?.services_description && <div className="mt-3" />}
               {mp?.services_description && (
@@ -200,17 +200,17 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
             </Section>
           )}
 
-          {/* Послуги */}
+          {/* Services */}
           {workTypes.length > 0 && (
-            <Section title="Послуги та ціни">
+            <Section title="Services & Prices">
               <div className="divide-y divide-gray-50">
                 {workTypes.map((wt: any) => (
                   <div key={wt.work_type_id} className="flex items-center justify-between py-2.5 first:pt-0">
                     <span className="text-sm text-gray-700">{wt.name}</span>
                     <span className="ml-4 shrink-0 text-sm font-semibold text-gray-800">
                       {wt.price > 0
-                        ? `£${wt.price} / ${wt.unit ?? 'год'}`
-                        : <span className="font-normal text-gray-400">за домовленістю</span>
+                        ? `£${wt.price} / ${wt.unit ?? 'hr'}`
+                        : <span className="font-normal text-gray-400">negotiable</span>
                       }
                     </span>
                   </div>
@@ -219,30 +219,30 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
             </Section>
           )}
 
-          {/* Відгуки */}
-          <Section title={`Відгуки${ratings.length > 0 ? ` (${ratings.length})` : ''}`}>
+          {/* Reviews */}
+          <Section title={`Reviews${ratings.length > 0 ? ` (${ratings.length})` : ''}`}>
             {avgRating > 0 && (
               <div className="mb-4 flex items-center gap-3">
                 <span className="text-4xl font-bold text-gray-900">{avgRating.toFixed(1)}</span>
                 <div>
                   <StarRating value={avgRating} />
-                  <p className="mt-1 text-xs text-gray-400">середній рейтинг</p>
+                  <p className="mt-1 text-xs text-gray-400">average rating</p>
                 </div>
               </div>
             )}
             {ratings.length === 0 ? (
-              <p className="text-sm text-gray-400">Відгуків поки немає.</p>
+              <p className="text-sm text-gray-400">No reviews yet.</p>
             ) : (
               <div className="divide-y divide-gray-100">
                 {ratings.map((r: any, i: number) => (
                   <div key={i} className="py-4 first:pt-0 last:pb-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-semibold text-gray-800">{r.rater_name || 'Замовник'}</span>
+                      <span className="text-sm font-semibold text-gray-800">{r.rater_name || 'Customer'}</span>
                       <div className="flex items-center gap-2 shrink-0">
                         <StarRating value={r.rating} />
                         {r.created_at && (
                           <span className="text-xs text-gray-400">
-                            {new Date(r.created_at).toLocaleDateString('uk-UA')}
+                            {new Date(r.created_at).toLocaleDateString('en-GB')}
                           </span>
                         )}
                       </div>
@@ -256,14 +256,14 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
             )}
           </Section>
 
-          {/* Виконані замовлення */}
+          {/* Completed orders */}
           <Section title="">
             <button
               onClick={() => setOrdersOpen(p => !p)}
               className="flex w-full items-center justify-between text-base font-bold text-gray-900 hover:text-orange-500 transition-colors"
             >
               <span>
-                Виконані замовлення
+                Completed Orders
                 {ordersOpen && completedOrders.length > 0 && (
                   <span className="ml-2 font-normal text-gray-400">({completedOrders.length})</span>
                 )}
@@ -281,7 +281,7 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
                 {ordersLoading ? (
                   <div className="flex justify-center py-6"><Spinner size="sm" /></div>
                 ) : completedOrders.length === 0 ? (
-                  <p className="text-sm text-gray-400">Виконаних замовлень поки немає.</p>
+                  <p className="text-sm text-gray-400">No completed orders yet.</p>
                 ) : (
                   <div className="divide-y divide-gray-100">
                     {completedOrders.map((order: any) => (
@@ -299,7 +299,7 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
                           <div className="mt-1 flex flex-wrap gap-3 text-xs text-gray-400">
                             {order.address && <span>📍 {order.address}</span>}
                             {order.completed_at && (
-                              <span>Виконано: {new Date(order.completed_at).toLocaleDateString('uk-UA')}</span>
+                              <span>Completed: {new Date(order.completed_at).toLocaleDateString('en-GB')}</span>
                             )}
                           </div>
                         )}
@@ -322,13 +322,13 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
                 href={`/orders/create?work_type_id=${workTypes[0]?.work_type_id ?? 0}&master_id=${masterId}`}
                 className="block w-full rounded-xl bg-orange-500 px-4 py-3 text-center text-sm font-bold text-white hover:bg-orange-600 transition-colors"
               >
-                Запропонувати роботу
+                Propose a Job
               </Link>
               <Link
                 href={`/messages/${masterId}`}
                 className="mt-2 block w-full rounded-xl border border-gray-200 px-4 py-3 text-center text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
               >
-                Повідомлення
+                Messages
               </Link>
             </div>
 
@@ -343,8 +343,8 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400">Статус</p>
-                      <p className="text-sm font-semibold text-gray-800">Верифіковано</p>
+                      <p className="text-xs text-gray-400">Status</p>
+                      <p className="text-sm font-semibold text-gray-800">Verified</p>
                     </div>
                   </div>
                 )}
@@ -357,7 +357,7 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400">Рейтинг</p>
+                      <p className="text-xs text-gray-400">Rating</p>
                       <p className="text-sm font-semibold text-gray-800">{avgRating.toFixed(1)} / 5.0</p>
                     </div>
                   </div>
@@ -371,8 +371,8 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400">Відгуки</p>
-                      <p className="text-sm font-semibold text-gray-800">{ratings.length} відгуків</p>
+                      <p className="text-xs text-gray-400">Reviews</p>
+                      <p className="text-sm font-semibold text-gray-800">{ratings.length} reviews</p>
                     </div>
                   </div>
                 )}
@@ -385,8 +385,8 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400">Досвід</p>
-                      <p className="text-sm font-semibold text-gray-800">{mp.experience_years} років</p>
+                      <p className="text-xs text-gray-400">Experience</p>
+                      <p className="text-sm font-semibold text-gray-800">{mp.experience_years} years</p>
                     </div>
                   </div>
                 )}

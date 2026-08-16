@@ -288,45 +288,45 @@ export const CreateOrderPage = () => {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="mb-2 text-2xl font-bold text-gray-800">Створити замовлення</h1>
+      <h1 className="mb-2 text-2xl font-bold text-gray-800">Create Order</h1>
       {workTypeData && (
         <p className="mb-6 text-gray-500">
-          Послуга: <span className="font-medium text-orange-500">{workTypeData.name}</span>
+          Service: <span className="font-medium text-orange-500">{workTypeData.name}</span>
         </p>
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-        {/* Ліва колонка — форма */}
+        {/* Left column — form */}
         <div className="flex flex-col gap-4">
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 font-semibold text-gray-800">Деталі замовлення</h2>
+            <h2 className="mb-4 font-semibold text-gray-800">Order Details</h2>
 
             {selectedMasterId && (
               <div className="mb-4 flex items-center justify-between rounded-lg border border-orange-200 bg-orange-50 px-4 py-3">
                 <p className="text-sm font-medium text-orange-700">
-                  🎯 Пряме замовлення обраному майстру
+                  🎯 Direct order to the selected master
                 </p>
                 <button
                   onClick={() => setSelectedMasterId(null)}
                   className="text-xs text-orange-500 hover:underline"
                 >
-                  Скасувати вибір
+                  Cancel selection
                 </button>
               </div>
             )}
 
             <div className="flex flex-col gap-4">
               <Input
-                label="Назва"
-                placeholder="Напр. Полагодити кран на кухні"
+                label="Title"
+                placeholder="E.g. Fix the kitchen tap"
                 error={orderForm.formState.errors.title?.message}
                 {...orderForm.register('title')}
               />
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Опис</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>
                 <textarea
                   rows={4}
-                  placeholder="Опишіть що потрібно зробити..."
+                  placeholder="Describe what needs to be done..."
                   className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
                   {...orderForm.register('description')}
                 />
@@ -335,20 +335,20 @@ export const CreateOrderPage = () => {
                 )}
               </div>
               <Input
-                label="Адреса / Поштовий індекс"
-                placeholder="Напр. LS1 4DY"
+                label="Address / Postcode"
+                placeholder="E.g. LS1 4DY"
                 error={orderForm.formState.errors.address?.message}
                 {...orderForm.register('address')}
               />
               <Input
-                label="Бюджет (£) — необов'язково"
+                label="Budget (£) — optional"
                 type="number"
                 placeholder="0"
                 {...orderForm.register('budget', { valueAsNumber: true })}
               />
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Дата виконання — необов'язково
+                  Scheduled date — optional
                 </label>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                   <input
@@ -369,7 +369,7 @@ export const CreateOrderPage = () => {
             </div>
           </div>
 
-          {/* Контактні дані — тільки для незалогінених */}
+          {/* Contact details — guests only */}
           {_hasHydrated && !isAuthenticated() && (
             <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
               <div className="mb-4 flex rounded-lg border border-gray-200 overflow-hidden">
@@ -380,7 +380,7 @@ export const CreateOrderPage = () => {
                     contactMode === 'guest' ? 'bg-orange-500 text-white' : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
-                  Новий замовник
+                  New Customer
                 </button>
                 <button
                   type="button"
@@ -389,7 +389,7 @@ export const CreateOrderPage = () => {
                     contactMode === 'login' ? 'bg-orange-500 text-white' : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
-                  Вже є акаунт
+                  Already Have an Account
                 </button>
               </div>
 
@@ -397,12 +397,12 @@ export const CreateOrderPage = () => {
                 <div className="flex flex-col gap-4">
                   <div className="grid grid-cols-2 gap-4">
                     <Input
-                      label="Ім'я"
+                      label="First Name"
                       error={guestForm.formState.errors.firstName?.message}
                       {...guestForm.register('firstName')}
                     />
                     <Input
-                      label="Прізвище"
+                      label="Last Name"
                       error={guestForm.formState.errors.lastName?.message}
                       {...guestForm.register('lastName')}
                     />
@@ -415,7 +415,7 @@ export const CreateOrderPage = () => {
                     {...guestForm.register('email')}
                   />
                   <Input
-                    label="Телефон"
+                    label="Phone"
                     placeholder="+447586983899"
                     error={guestForm.formState.errors.phone?.message}
                     {...guestForm.register('phone')}
@@ -431,7 +431,7 @@ export const CreateOrderPage = () => {
                     {...loginForm.register('email')}
                   />
                   <Input
-                    label="Пароль"
+                    label="Password"
                     type="password"
                     placeholder="••••••••"
                     error={loginForm.formState.errors.password?.message}
@@ -450,17 +450,17 @@ export const CreateOrderPage = () => {
 
           <Button onClick={handleSubmit} loading={isPending} className="w-full">
             {selectedMasterId
-              ? 'Надіслати замовлення майстру →'
+              ? 'Send Order to Master →'
               : contactMode === 'guest' && !isAuthenticated()
-              ? 'Опублікувати замовлення →'
-              : 'Підтвердити замовлення'}
+              ? 'Publish Order →'
+              : 'Confirm Order'}
           </Button>
         </div>
 
-        {/* Права колонка — список майстрів */}
+        {/* Right column — masters list */}
         <MastersSidebar
           workTypeId={Number(workTypeId) || 0}
-          title={workTypeData ? `Майстри — ${workTypeData.name}` : 'Доступні майстри'}
+          title={workTypeData ? `Masters — ${workTypeData.name}` : 'Available Masters'}
           selectedMasterId={selectedMasterId}
           onSelectMaster={setSelectedMasterId}
         />

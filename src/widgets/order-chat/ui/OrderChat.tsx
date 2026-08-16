@@ -8,8 +8,8 @@ interface Props {
   orderId: string
   myRole: 'customer' | 'master'
   masterId?: string
-  // Початковий текст відгуку на замовлення — показуємо як перше повідомлення
-  // в тій самій рамці, щоб не дублювати бульбашку окремо над чатом.
+  // Initial text of the response to the order — shown as the first message
+  // in the same frame, so we don't duplicate the bubble separately above the chat.
   leadingMessage?: string
 }
 
@@ -54,7 +54,7 @@ export const OrderChat = ({ orderId, myRole, masterId, leadingMessage }: Props) 
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Повідомлення */}
+      {/* Messages */}
       <div className="flex max-h-64 flex-col gap-2 overflow-y-auto rounded-lg border border-gray-100 bg-gray-50 p-3">
         {leadingMessage && (
           <div className="flex flex-col items-end gap-0.5">
@@ -64,7 +64,7 @@ export const OrderChat = ({ orderId, myRole, masterId, leadingMessage }: Props) 
           </div>
         )}
         {messages.length === 0 && !leadingMessage ? (
-          <p className="text-center text-xs text-gray-400">Повідомлень ще немає</p>
+          <p className="text-center text-xs text-gray-400">No messages yet</p>
         ) : (
           messages.map((msg: any) => {
             const isMe = msg.role === myRole
@@ -83,8 +83,8 @@ export const OrderChat = ({ orderId, myRole, masterId, leadingMessage }: Props) 
                   {msg.text}
                 </div>
                 <span className="text-xs text-gray-400">
-                  {msg.role === 'master' ? 'Виконавець' : 'Замовник'} ·{' '}
-                  {new Date(msg.created_at).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}
+                  {msg.role === 'master' ? 'Master' : 'Customer'} ·{' '}
+                  {new Date(msg.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
             )
@@ -93,14 +93,14 @@ export const OrderChat = ({ orderId, myRole, masterId, leadingMessage }: Props) 
         <div ref={bottomRef} />
       </div>
 
-      {/* Поле вводу */}
+      {/* Input field */}
       <div className="flex gap-2">
         <input
           type="text"
           value={text}
           onChange={e => setText(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-          placeholder="Написати повідомлення..."
+          placeholder="Write a message..."
           className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
         />
         <button

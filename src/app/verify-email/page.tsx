@@ -21,13 +21,13 @@ function VerifyEmailContent() {
   useEffect(() => {
     if (!token) {
       setStatus('error')
-      setMessage('Токен не знайдено')
+      setMessage('Token not found')
       return
     }
 
     apiClient.get(`/api/v1/auth/verify-email?token=${token}`)
       .then(async () => {
-        // Читаємо поточний стан store (не закешований з рендеру)
+        // Read the current store state (not cached from render)
         const currentToken = useAuthStore.getState().accessToken
 
         if (currentToken) {
@@ -36,12 +36,12 @@ function VerifyEmailContent() {
             setUser(freshProfile)
             setIsLoggedIn(true)
           } catch {
-            // тихо ігноруємо
+            // silently ignore
           }
         }
 
         setStatus('success')
-        setMessage('Email успішно підтверджено!')
+        setMessage('Email verified successfully!')
 
         setTimeout(() => {
           router.push(currentToken ? '/profile' : '/login?verified=true')
@@ -49,7 +49,7 @@ function VerifyEmailContent() {
       })
       .catch(() => {
         setStatus('error')
-        setMessage('Посилання недійсне або прострочене')
+        setMessage('The link is invalid or has expired')
       })
   }, [token])
 
@@ -59,17 +59,17 @@ function VerifyEmailContent() {
         {status === 'loading' && (
           <>
             <Spinner size="lg" className="mx-auto mb-4" />
-            <p className="text-gray-600">Підтвердження email...</p>
+            <p className="text-gray-600">Verifying email...</p>
           </>
         )}
 
         {status === 'success' && (
           <>
             <div className="mb-4 text-5xl">✅</div>
-            <h1 className="mb-2 text-2xl font-bold text-gray-800">Готово!</h1>
+            <h1 className="mb-2 text-2xl font-bold text-gray-800">Done!</h1>
             <p className="mb-4 text-gray-600">{message}</p>
             <p className="text-sm text-gray-500">
-              {isLoggedIn ? 'Переходимо до профілю...' : 'Переходимо на сторінку входу...'}
+              {isLoggedIn ? 'Redirecting to your profile...' : 'Redirecting to the login page...'}
             </p>
           </>
         )}
@@ -77,10 +77,10 @@ function VerifyEmailContent() {
         {status === 'error' && (
           <>
             <div className="mb-4 text-5xl">❌</div>
-            <h1 className="mb-2 text-2xl font-bold text-gray-800">Помилка</h1>
+            <h1 className="mb-2 text-2xl font-bold text-gray-800">Error</h1>
             <p className="mb-4 text-gray-600">{message}</p>
             <Link href="/login" className="text-orange-500 hover:underline">
-              Перейти на сторінку входу
+              Go to the login page
             </Link>
           </>
         )}

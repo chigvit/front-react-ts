@@ -7,11 +7,11 @@ export default function RegisterPage() {
     <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-gray-50 px-4 py-12">
       <Card className="w-full max-w-md">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-gray-800">Реєстрація</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Sign up</h1>
           <p className="mt-1 text-sm text-gray-600">
-            Вже є акаунт?{' '}
+            Already have an account?{' '}
             <Link href="/login" className="text-orange-500 hover:underline">
-              Увійти
+              Log in
             </Link>
           </p>
         </div>

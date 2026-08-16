@@ -22,7 +22,7 @@ export const LogoutButton = () => {
 
   return (
     <Button variant="outline" size="sm" onClick={handleLogout}>
-      Вийти
+      Log out
     </Button>
   )
 }

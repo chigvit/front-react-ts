@@ -20,12 +20,13 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
-// Бекенд видає одноразовий (ротаційний) refresh-токен: кожне оновлення анулює
-// попередній. Якщо кілька запитів одночасно ловлять 401 (звичайна ситуація —
-// React Query часто робить паралельні запити), кожен з них НЕ повинен окремо
-// смикати /auth/refresh старим токеном — лише перший встигне, решта отримають
-// "token already used" і розлогінять користувача попри жива сесію. Тому всі
-// паралельні 401 чекають один спільний запит на оновлення.
+// The backend issues a one-time (rotating) refresh token: each refresh
+// invalidates the previous one. If several requests hit a 401 at the same
+// time (a normal situation — React Query often fires parallel requests),
+// none of them should independently hit /auth/refresh with the old token —
+// only the first would succeed, the rest would get "token already used" and
+// log the user out despite a live session. So all parallel 401s wait on one
+// shared refresh request.
 let refreshPromise: Promise<{ access_token: string; refresh_token: string }> | null = null
 
 function refreshTokens() {
@@ -46,7 +47,7 @@ apiClient.interceptors.response.use(
   async (error) => {
     const original = error.config
 
-    // Пропускаємо interceptor для auth запитів
+    // Skip the interceptor for auth requests
     if (
       original.url?.includes('/auth/login') ||
       original.url?.includes('/auth/register') ||
@@ -60,7 +61,7 @@ apiClient.interceptors.response.use(
       try {
         const data = await refreshTokens()
 
-        // Оновлюємо localStorage і Zustand разом, щоб стан не розходився
+        // Update localStorage and Zustand together so the state doesn't diverge
         localStorage.setItem('access_token', data.access_token)
         localStorage.setItem('refresh_token', data.refresh_token)
 
@@ -72,7 +73,7 @@ apiClient.interceptors.response.use(
         original.headers.Authorization = `Bearer ${data.access_token}`
         return apiClient(original)
       } catch {
-        // Refresh не вдався — повністю виходимо (очищаємо і localStorage і Zustand)
+        // Refresh failed — log out completely (clear both localStorage and Zustand)
         useAuthStore.getState().logout()
 
         const authPages = ['/login', '/register', '/forgot-password', '/reset-password', '/check-email', '/verify-email']

@@ -15,7 +15,7 @@ export const MasterProfilePage = ({ masterId }: Props) => {
           href="/masters"
           className="mb-4 inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors"
         >
-          ← Назад до майстрів
+          ← Back to masters
         </Link>
 
         <MasterProfileContent masterId={masterId} />

@@ -32,10 +32,11 @@ export const CreateOrderDropdown = ({ isOpen, onOpenChange, isActive }: Props) =
   })
 
   useEffect(() => {
-    // isOpen у замиканні: якщо це меню зараз закрите, зовнішній клік (який
-    // насправді може бути кліком усередині ІНШОГО меню в шапці) не повинен
-    // чіпати спільний стан "яке меню відкрите" — інакше клік по пункту в
-    // сусідньому дропдауні миттєво закриває той-таки дропдаун ще до навігації.
+    // isOpen in the closure: if this menu is currently closed, an outside click
+    // (which might actually be a click inside ANOTHER menu in the header) should
+    // not touch the shared "which menu is open" state — otherwise clicking an
+    // item in a sibling dropdown would instantly close that same dropdown
+    // before navigation happens.
     if (!isOpen) return
     const handleClickOutside = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
@@ -70,7 +71,7 @@ export const CreateOrderDropdown = ({ isOpen, onOpenChange, isActive }: Props) =
 
       {isOpen && (
         <div className="absolute left-0 top-full z-50 mt-2 flex rounded-xl border border-gray-200 bg-white shadow-xl overflow-hidden">
-          {/* Ліва колонка — категорії */}
+          {/* Left column — categories */}
           <div className="w-64 max-h-[28rem] overflow-y-auto border-r border-gray-100 py-2">
             {categoriesData?.map((category: any) => (
               <button
@@ -91,7 +92,7 @@ export const CreateOrderDropdown = ({ isOpen, onOpenChange, isActive }: Props) =
             ))}
           </div>
 
-          {/* Права колонка — типи робіт */}
+          {/* Right column — work types */}
           <div className="w-72 max-h-[28rem] overflow-y-auto py-2">
             {hoveredCategory?.workTypes.map((wt: any) => (
               <Link

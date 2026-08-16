@@ -12,8 +12,8 @@ import { userApi } from '@/entities/user/api/userApi'
 import { useAuthStore } from '@/entities/user/model/userStore'
 
 const schema = z.object({
-  email: z.string().email('Невірний формат email'),
-  password: z.string().min(8, 'Мінімум 8 символів'),
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(8, 'Minimum 8 characters'),
 })
 
 type FormData = z.infer<typeof schema>
@@ -68,7 +68,7 @@ export const LoginForm = ({ redirectTo = '/' }: LoginFormProps) => {
       />
 
       <Input
-        label="Пароль"
+        label="Password"
         type="password"
         autoComplete="current-password"
         placeholder="••••••••"
@@ -79,9 +79,9 @@ export const LoginForm = ({ redirectTo = '/' }: LoginFormProps) => {
       {loginError === 'not_registered' && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-3">
           <p className="text-sm text-red-600">
-            Користувача з таким email не знайдено.{' '}
+            No user found with this email.{' '}
             <Link href="/register" className="font-medium underline hover:text-red-800">
-              Зареєструватись
+              Sign up
             </Link>
           </p>
         </div>
@@ -90,7 +90,7 @@ export const LoginForm = ({ redirectTo = '/' }: LoginFormProps) => {
       {loginError === 'email_not_verified' && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
           <p className="text-sm text-amber-700">
-            Email не підтверджено. Перевірте пошту та перейдіть за посиланням активації.
+            Email not verified. Check your inbox and follow the activation link.
           </p>
         </div>
       )}
@@ -98,16 +98,16 @@ export const LoginForm = ({ redirectTo = '/' }: LoginFormProps) => {
       {loginError === 'wrong_password' && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-3">
           <p className="text-sm text-red-600">
-            Невірний пароль.{' '}
+            Incorrect password.{' '}
             <Link href="/forgot-password" className="font-medium underline hover:text-red-800">
-              Відновити пароль
+              Reset password
             </Link>
           </p>
         </div>
       )}
 
       <Button type="submit" loading={isPending} className="w-full">
-        Увійти
+        Log in
       </Button>
     </form>
   )

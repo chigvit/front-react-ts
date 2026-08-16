@@ -47,7 +47,7 @@ export const WorkTypesTab = () => {
 
   const { mutate: saveWorkTypes, isPending } = useMutation({
     mutationFn: async (ids: number[]) => {
-      // Зберігаємо існуючі ціни
+      // Preserve existing prices
       const existingItems = selectedData ?? []
 
       const items = ids.map(id => {
@@ -97,13 +97,13 @@ export const WorkTypesTab = () => {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-800">Типи робіт</h2>
-          <p className="text-sm text-gray-500">Вибрано: {selectedIds.length} типів</p>
+          <h2 className="text-lg font-semibold text-gray-800">Work Types</h2>
+          <p className="text-sm text-gray-500">Selected: {selectedIds.length} types</p>
         </div>
         <div className="flex items-center gap-3">
-          {saved && <p className="text-sm text-green-600">✅ Збережено!</p>}
+          {saved && <p className="text-sm text-green-600">✅ Saved!</p>}
           <Button onClick={() => saveWorkTypes(selectedIds)} loading={isPending}>
-            Зберегти
+            Save
           </Button>
         </div>
       </div>

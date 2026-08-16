@@ -89,13 +89,13 @@ function EditForm({ order, orderId }: EditFormProps) {
 
         <div className="flex flex-col gap-5">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Категорія послуги</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Service Category</label>
             <select
               value={workTypeId}
               onChange={(e) => setWorkTypeId(Number(e.target.value))}
               className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400 bg-white"
             >
-              <option value={0}>— оберіть категорію —</option>
+              <option value={0}>— select a category —</option>
               {categoriesData?.map((cat: any) =>
                 cat.workTypes?.length > 0 ? (
                   <optgroup key={cat.id} label={cat.name}>
@@ -156,7 +156,7 @@ function EditForm({ order, orderId }: EditFormProps) {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Дата виконання</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Scheduled date</label>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
               <input
                 type="date"

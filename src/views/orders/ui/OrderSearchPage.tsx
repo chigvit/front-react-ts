@@ -16,15 +16,15 @@ import { Button } from '@/shared/ui/Button'
 import { OrderChat } from '@/widgets/order-chat/ui/OrderChat'
 
 const guestSchema = z.object({
-  firstName: z.string().min(2, 'Мінімум 2 символи'),
-  lastName: z.string().min(2, 'Мінімум 2 символи'),
-  email: z.string().email('Невірний email'),
-  phone: z.string().min(10, 'Невірний номер телефону'),
+  firstName: z.string().min(2, 'Minimum 2 characters'),
+  lastName: z.string().min(2, 'Minimum 2 characters'),
+  email: z.string().email('Invalid email'),
+  phone: z.string().min(10, 'Invalid phone number'),
 })
 
 const loginSchema = z.object({
-  email: z.string().email('Невірний email'),
-  password: z.string().min(8, 'Мінімум 8 символів'),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(8, 'Minimum 8 characters'),
 })
 
 type GuestFormData = z.infer<typeof guestSchema>
@@ -43,7 +43,7 @@ export const OrderSearchPage = () => {
   const [responseForm, setResponseForm] = useState<Record<string, { message: string; price: string }>>({})
   const [responseError, setResponseError] = useState<Record<string, string>>({})
 
-  // ─── Гостьовий флоу для незалогінених (відгукнутись без акаунту) ───
+  // ─── Guest flow for unauthenticated users (respond without an account) ───
   const [authOrderId, setAuthOrderId] = useState<string | null>(null)
   const [authMode, setAuthMode] = useState<'guest' | 'login'>('guest')
   const [authStep, setAuthStep] = useState<'form' | 'verify'>('form')
@@ -72,8 +72,8 @@ export const OrderSearchPage = () => {
 
   const orderIds = useMemo<string[]>(() => (ordersData ?? []).map((o: any) => o.id), [ordersData])
 
-  // Мій відгук на кожне замовлення (з сервера, а не лише з локального стану) —
-  // потрібно, щоб побачити свій відгук і відповідь замовника після оновлення сторінки.
+  // My response to each order (from the server, not just local state) —
+  // needed to see my response and the customer's answer after a page refresh.
   const { data: myResponsesData } = useQuery({
     queryKey: ['my-responses', orderIds],
     queryFn: async () => {
@@ -130,7 +130,7 @@ export const OrderSearchPage = () => {
       queryClient.invalidateQueries({ queryKey: ['my-responses', orderIds] })
     },
     onError: (error: any, { orderId }) => {
-      const message = error?.response?.data?.error ?? 'Не вдалося надіслати відгук. Спробуйте ще раз.'
+      const message = error?.response?.data?.error ?? 'Failed to submit response. Please try again.'
       setResponseError(prev => ({ ...prev, [orderId]: message }))
     },
   })
@@ -156,7 +156,7 @@ export const OrderSearchPage = () => {
       return
     }
 
-    // Незалогінений — зберігаємо чернетку відгуку і показуємо форму входу/реєстрації
+    // Unauthenticated — save the response draft and show the login/register form
     setPendingResponse({ orderId: order.id, message: form.message, price: Number(form.price) || 0 })
     setAuthOrderId(order.id)
     setAuthMode('guest')
@@ -183,7 +183,7 @@ export const OrderSearchPage = () => {
       setSavedGuestPhone(data.phone)
       setAuthStep('verify')
     } catch {
-      setAuthError('Не вдалося зареєструватись. Спробуйте ще раз.')
+      setAuthError('Failed to register. Please try again.')
     } finally {
       setIsAuthPending(false)
     }
@@ -203,7 +203,7 @@ export const OrderSearchPage = () => {
       respondMutation.mutate(pendingResponse)
       closeAuthFlow()
     } catch {
-      setAuthError('Невірний email або пароль.')
+      setAuthError('Invalid email or password.')
     } finally {
       setIsAuthPending(false)
     }
@@ -230,7 +230,7 @@ export const OrderSearchPage = () => {
       closeAuthFlow()
     } catch (err: any) {
       const msg = err.response?.data?.error ?? ''
-      setAuthError(msg.includes('expired') ? 'Код прострочено.' : 'Невірний код. Спробуйте ще раз.')
+      setAuthError(msg.includes('expired') ? 'Code expired.' : 'Incorrect code. Please try again.')
     } finally {
       setIsAuthPending(false)
     }
@@ -248,9 +248,9 @@ export const OrderSearchPage = () => {
       })
       setDevCode(res.data.dev_code)
       setSmsCode('')
-      setResendMessage('Новий код надіслано.')
+      setResendMessage('A new code has been sent.')
     } catch {
-      setAuthError('Не вдалося надіслати код. Спробуйте ще раз.')
+      setAuthError('Failed to resend code. Please try again.')
     } finally {
       setIsResending(false)
     }
@@ -280,13 +280,13 @@ export const OrderSearchPage = () => {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold text-gray-800">Пошук замовлень</h1>
+      <h1 className="mb-6 text-2xl font-bold text-gray-800">Order Search</h1>
 
-      {/* Фільтри */}
+      {/* Filters */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row">
         <input
           type="text"
-          placeholder="Пошук за назвою, описом, адресою..."
+          placeholder="Search by title, description, address..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
@@ -296,7 +296,7 @@ export const OrderSearchPage = () => {
           onChange={e => setSelectedCategoryId(Number(e.target.value))}
           className="rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
         >
-          <option value={0}>Всі категорії</option>
+          <option value={0}>All Categories</option>
           {(categoriesData ?? []).map((cat: any) => (
             <option key={cat.id} value={cat.id}>{cat.icon ? `${cat.icon} ` : ''}{cat.name_en || cat.name}</option>
           ))}
@@ -306,11 +306,11 @@ export const OrderSearchPage = () => {
       {filtered.length === 0 ? (
         <div className="rounded-xl border border-gray-200 bg-white p-12 text-center">
           <div className="mb-4 text-5xl">🔍</div>
-          <p className="text-gray-500">Замовлень не знайдено.</p>
+          <p className="text-gray-500">No orders found.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          <p className="text-sm text-gray-400">{filtered.length} замовлень</p>
+          <p className="text-sm text-gray-400">{filtered.length} orders</p>
           {filtered.map((order: any) => {
             const isExpanded = expandedId === order.id
             const form = responseForm[order.id] ?? { message: '', price: '' }
@@ -324,16 +324,16 @@ export const OrderSearchPage = () => {
                 key={order.id}
                 className="rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
               >
-                {/* Заголовок */}
+                {/* Header */}
                 <div className="p-5">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="mb-1 flex flex-wrap items-center gap-2">
                         <h2 className="text-lg font-semibold text-gray-800">{order.title}</h2>
-                        <Badge variant="info">Відкрите</Badge>
+                        <Badge variant="info">Open</Badge>
                         {last && (
                           <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-600">
-                            ✓ Надіслано
+                            ✓ Sent
                           </span>
                         )}
                       </div>
@@ -348,26 +348,26 @@ export const OrderSearchPage = () => {
                         )}
                         {order.address && <span>📍 {order.address}</span>}
                         {order.budget > 0 && <span>💰 £{order.budget}</span>}
-                        <span>🕐 {new Date(order.created_at).toLocaleDateString('uk-UA')}</span>
+                        <span>🕐 {new Date(order.created_at).toLocaleDateString('en-GB')}</span>
                       </div>
                     </div>
                     <button
                       onClick={() => setExpandedId(isExpanded ? null : order.id)}
                       className="ml-4 shrink-0 rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-500 transition-colors hover:bg-gray-50"
                     >
-                      {isExpanded ? '▲ Згорнути' : '▼ Деталі'}
+                      {isExpanded ? '▲ Collapse' : '▼ Details'}
                     </button>
                   </div>
                 </div>
 
-                {/* Деталі + форма відгуку */}
+                {/* Details + response form */}
                 {isExpanded && (
                   <div className="border-t border-gray-100 px-5 pb-5">
                     <div className="pt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm">
                       {order.work_type_id > 0 && (
                         <div className="flex items-center gap-2 text-gray-600">
                           <span>🔧</span>
-                          <span>Послуга: <span className="font-medium text-gray-800">
+                          <span>Service: <span className="font-medium text-gray-800">
                             {workTypeMap[order.work_type_id] ?? `#${order.work_type_id}`}
                           </span></span>
                         </div>
@@ -375,22 +375,22 @@ export const OrderSearchPage = () => {
                       {order.budget > 0 && (
                         <div className="flex items-center gap-2 text-gray-600">
                           <span>💰</span>
-                          <span>Бюджет: <span className="font-medium text-gray-800">£{order.budget}</span></span>
+                          <span>Budget: <span className="font-medium text-gray-800">£{order.budget}</span></span>
                         </div>
                       )}
                       <div className="flex items-center gap-2 text-gray-600">
                         <span>🕐</span>
-                        <span>Створено: <span className="font-medium text-gray-800">
-                          {new Date(order.created_at).toLocaleString('uk-UA')}
+                        <span>Created: <span className="font-medium text-gray-800">
+                          {new Date(order.created_at).toLocaleString('en-GB')}
                         </span></span>
                       </div>
                       {order.scheduled_at && (
                         <div className="flex items-center gap-2 text-gray-600">
                           <span>📅</span>
-                          <span>Дата: <span className="font-medium text-gray-800">
-                            {new Date(order.scheduled_at.slice(0, 10) + 'T12:00:00').toLocaleDateString('uk-UA')}
+                          <span>Date: <span className="font-medium text-gray-800">
+                            {new Date(order.scheduled_at.slice(0, 10) + 'T12:00:00').toLocaleDateString('en-GB')}
                             {order.scheduled_to && (
-                              <> — {new Date(order.scheduled_to.slice(0, 10) + 'T12:00:00').toLocaleDateString('uk-UA')}</>
+                              <> — {new Date(order.scheduled_to.slice(0, 10) + 'T12:00:00').toLocaleDateString('en-GB')}</>
                             )}
                           </span></span>
                         </div>
@@ -398,27 +398,27 @@ export const OrderSearchPage = () => {
                       {order.address && (
                         <div className="flex items-center gap-2 text-gray-600 sm:col-span-2">
                           <span>📍</span>
-                          <span>Адреса: <span className="font-medium text-gray-800">{order.address}</span></span>
+                          <span>Address: <span className="font-medium text-gray-800">{order.address}</span></span>
                         </div>
                       )}
                     </div>
 
-                    {/* Форма відгуку */}
+                    {/* Response form */}
                     <div className="mt-4 border-t border-gray-100 pt-4 space-y-3">
                       {last ? (
                         <>
-                          <p className="text-sm text-gray-500">✓ Ви вже відгукнулись на це замовлення:</p>
+                          <p className="text-sm text-gray-500">✓ You have already responded to this order:</p>
                           <OrderChat orderId={order.id} myRole="master" leadingMessage={last} />
                         </>
                       ) : showAuthFlow ? (
                         <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
                           {authStep === 'verify' ? (
                             <div className="flex flex-col gap-3">
-                              <p className="text-sm font-medium text-gray-700">Введіть код із SMS</p>
-                              <p className="text-xs text-gray-500">Ми надіслали 6-значний код на ваш телефон.</p>
+                              <p className="text-sm font-medium text-gray-700">Enter SMS Code</p>
+                              <p className="text-xs text-gray-500">We sent a 6-digit code to your phone number.</p>
                               {devCode && (
                                 <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-2">
-                                  <p className="text-xs text-yellow-700">🧪 DEV — код: <strong>{devCode}</strong></p>
+                                  <p className="text-xs text-yellow-700">🧪 DEV — code: <strong>{devCode}</strong></p>
                                 </div>
                               )}
                               <input
@@ -433,16 +433,16 @@ export const OrderSearchPage = () => {
                               {resendMessage && !authError && <p className="text-sm text-green-600">{resendMessage}</p>}
                               <div className="flex gap-2">
                                 <Button onClick={handleVerifyCode} loading={isAuthPending} disabled={smsCode.length !== 6} className="flex-1">
-                                  Підтвердити і відгукнутись
+                                  Confirm & Respond
                                 </Button>
-                                <Button variant="outline" onClick={closeAuthFlow}>Скасувати</Button>
+                                <Button variant="outline" onClick={closeAuthFlow}>Cancel</Button>
                               </div>
                               <button
                                 onClick={handleResendCode}
                                 disabled={isResending}
                                 className="text-sm text-orange-600 hover:underline disabled:opacity-50"
                               >
-                                {isResending ? 'Надсилаємо...' : 'Не отримали код? Надіслати ще раз'}
+                                {isResending ? 'Sending...' : "Didn't get a code? Resend"}
                               </button>
                             </div>
                           ) : (
@@ -453,39 +453,39 @@ export const OrderSearchPage = () => {
                                   onClick={() => setAuthMode('guest')}
                                   className={`flex-1 py-2 text-sm font-medium transition-colors ${authMode === 'guest' ? 'bg-orange-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                                 >
-                                  Новий користувач
+                                  New User
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => setAuthMode('login')}
                                   className={`flex-1 py-2 text-sm font-medium transition-colors ${authMode === 'login' ? 'bg-orange-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                                 >
-                                  Вже є акаунт
+                                  Already Have an Account
                                 </button>
                               </div>
 
                               {authMode === 'guest' ? (
                                 <div className="flex flex-col gap-3">
                                   <div className="grid grid-cols-2 gap-3">
-                                    <Input label="Ім'я" error={guestForm.formState.errors.firstName?.message} {...guestForm.register('firstName')} />
-                                    <Input label="Прізвище" error={guestForm.formState.errors.lastName?.message} {...guestForm.register('lastName')} />
+                                    <Input label="First Name" error={guestForm.formState.errors.firstName?.message} {...guestForm.register('firstName')} />
+                                    <Input label="Last Name" error={guestForm.formState.errors.lastName?.message} {...guestForm.register('lastName')} />
                                   </div>
                                   <Input label="Email" type="email" placeholder="your@email.com" error={guestForm.formState.errors.email?.message} {...guestForm.register('email')} />
-                                  <Input label="Телефон" placeholder="+447586983899" error={guestForm.formState.errors.phone?.message} {...guestForm.register('phone')} />
+                                  <Input label="Phone" placeholder="+447586983899" error={guestForm.formState.errors.phone?.message} {...guestForm.register('phone')} />
                                   {authError && <p className="text-sm text-red-500">{authError}</p>}
                                   <div className="flex gap-2">
-                                    <Button onClick={handleGuestSubmit} loading={isAuthPending} className="flex-1">Далі →</Button>
-                                    <Button variant="outline" onClick={closeAuthFlow}>Скасувати</Button>
+                                    <Button onClick={handleGuestSubmit} loading={isAuthPending} className="flex-1">Next →</Button>
+                                    <Button variant="outline" onClick={closeAuthFlow}>Cancel</Button>
                                   </div>
                                 </div>
                               ) : (
                                 <div className="flex flex-col gap-3">
                                   <Input label="Email" type="email" placeholder="your@email.com" error={loginForm.formState.errors.email?.message} {...loginForm.register('email')} />
-                                  <Input label="Пароль" type="password" placeholder="••••••••" error={loginForm.formState.errors.password?.message} {...loginForm.register('password')} />
+                                  <Input label="Password" type="password" placeholder="••••••••" error={loginForm.formState.errors.password?.message} {...loginForm.register('password')} />
                                   {authError && <p className="text-sm text-red-500">{authError}</p>}
                                   <div className="flex gap-2">
-                                    <Button onClick={handleLoginSubmit} loading={isAuthPending} className="flex-1">Увійти і відгукнутись</Button>
-                                    <Button variant="outline" onClick={closeAuthFlow}>Скасувати</Button>
+                                    <Button onClick={handleLoginSubmit} loading={isAuthPending} className="flex-1">Log In & Respond</Button>
+                                    <Button variant="outline" onClick={closeAuthFlow}>Cancel</Button>
                                   </div>
                                 </div>
                               )}
@@ -496,7 +496,7 @@ export const OrderSearchPage = () => {
                         <>
                           <textarea
                             rows={3}
-                            placeholder="Напишіть повідомлення замовнику..."
+                            placeholder="Write a message to the customer..."
                             value={form.message}
                             onChange={e => setResponseForm(prev => ({
                               ...prev,
@@ -513,7 +513,7 @@ export const OrderSearchPage = () => {
                               <input
                                 type="number"
                                 min="0"
-                                placeholder="Ціна"
+                                placeholder="Price"
                                 value={form.price}
                                 onChange={e => setResponseForm(prev => ({
                                   ...prev,
@@ -527,7 +527,7 @@ export const OrderSearchPage = () => {
                               disabled={!form.message.trim() || respondMutation.isPending}
                               className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
                             >
-                              {respondMutation.isPending ? 'Надсилаємо...' : 'Відгукнутись'}
+                              {respondMutation.isPending ? 'Sending...' : 'Respond'}
                             </button>
                           </div>
                         </>

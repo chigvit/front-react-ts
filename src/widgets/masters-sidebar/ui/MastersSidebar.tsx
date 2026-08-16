@@ -14,10 +14,10 @@ interface Props {
   title?: string
   selectedMasterId?: string | null
   onSelectMaster?: (masterId: string | null) => void
-  // MyOrdersPage: пропонуємо існуюче замовлення
+  // MyOrdersPage: propose an existing order
   proposableOrderId?: string | null
   onProposed?: () => void
-  // Приховати кнопку "Запропонувати" (замовлення не в статусі OPEN)
+  // Hide the "Propose" button (order not in OPEN status)
   hidePropose?: boolean
 }
 
@@ -58,18 +58,18 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
     <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
       <div className="border-b border-gray-100 px-4 py-3">
         <h3 className="text-sm font-semibold text-gray-800">
-          {title ?? 'Доступні майстри'}
+          {title ?? 'Available Masters'}
         </h3>
         <p className="mt-0.5 text-xs text-gray-400">
           {isLoading
-            ? 'Пошук майстрів...'
+            ? 'Searching masters...'
             : masters.length > 0
-              ? `${masters.length} майстрів поруч`
-              : 'Немає майстрів поруч'}
+              ? `${masters.length} masters nearby`
+              : 'No masters nearby'}
         </p>
         {proposableOrderId && (
           <p className="mt-1.5 rounded-md bg-orange-50 px-2 py-1 text-xs text-orange-600">
-            🎯 Натисніть «Запропонувати» щоб надіслати замовлення майстру
+            🎯 Click "Propose" to send the order to a master
           </p>
         )}
       </div>
@@ -82,7 +82,7 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
         ) : masters.length === 0 ? (
           <div className="px-4 py-12 text-center text-sm text-gray-400">
             <p className="mb-1 text-3xl">🔍</p>
-            Майстрів не знайдено
+            No masters found
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
@@ -112,9 +112,9 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
                       </p>
                       <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-gray-400">
                         {master.rating > 0 && <span className="text-yellow-500">⭐ {master.rating}</span>}
-                        {master.reviews_count > 0 && <span>{master.reviews_count} відг.</span>}
-                        {master.distance_meters > 0 && <span>📍 {(master.distance_meters / 1000).toFixed(1)} км</span>}
-                        {master.experience_years > 0 && <span>🛠 {master.experience_years} р.</span>}
+                        {master.reviews_count > 0 && <span>{master.reviews_count} rev.</span>}
+                        {master.distance_meters > 0 && <span>📍 {(master.distance_meters / 1000).toFixed(1)} km</span>}
+                        {master.experience_years > 0 && <span>🛠 {master.experience_years} yrs</span>}
                       </div>
                     </div>
                   </div>
@@ -124,7 +124,7 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
                     onClick={() => setExpandedMasterId(isExpanded ? null : master.user_id)}
                     className="mb-2 w-full rounded-lg border border-gray-200 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                   >
-                    {isExpanded ? 'Сховати ▲' : 'Детальніше ▼'}
+                    {isExpanded ? 'Hide ▲' : 'Details ▼'}
                   </button>
 
                   {/* Expanded profile */}
@@ -138,25 +138,25 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
                       )}
                       {master.bio && (
                         <div>
-                          <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">Про себе</p>
+                          <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">About</p>
                           <p className="leading-relaxed text-gray-700">{master.bio}</p>
                         </div>
                       )}
                       {master.services_description && (
                         <div>
-                          <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">Послуги</p>
+                          <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">Services</p>
                           <p className="leading-relaxed text-gray-700">{master.services_description}</p>
                         </div>
                       )}
                       <div className="flex flex-wrap gap-3 border-t border-gray-100 pt-2">
                         {master.experience_years > 0 && (
-                          <span className="flex items-center gap-1">🛠 <span className="font-medium text-gray-700">{master.experience_years} р. досвіду</span></span>
+                          <span className="flex items-center gap-1">🛠 <span className="font-medium text-gray-700">{master.experience_years} yrs experience</span></span>
                         )}
                         {master.rating > 0 && (
                           <span className="flex items-center gap-1">⭐ <span className="font-medium text-gray-700">{master.rating}</span></span>
                         )}
                         {master.reviews_count > 0 && (
-                          <span className="text-gray-500">{master.reviews_count} відгуків</span>
+                          <span className="text-gray-500">{master.reviews_count} reviews</span>
                         )}
                       </div>
                       <Link
@@ -164,7 +164,7 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
                         target="_blank"
                         className="inline-flex items-center gap-1 text-orange-500 hover:underline"
                       >
-                        Відкрити повний профіль →
+                        Open full profile →
                       </Link>
                     </div>
                   )}
@@ -172,7 +172,7 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
                   {/* Action buttons */}
                   <div className="flex gap-2">
                     {onSelectMaster ? (
-                      // CreateOrderPage: вибір майстра для форми
+                      // CreateOrderPage: select master for the form
                       <button
                         onClick={() => onSelectMaster(isSelected ? null : master.user_id)}
                         className={`flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
@@ -181,13 +181,13 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
                             : 'bg-orange-500 text-white hover:bg-orange-600'
                         }`}
                       >
-                        {isSelected ? '✓ Обрано' : 'Запропонувати'}
+                        {isSelected ? '✓ Selected' : 'Propose'}
                       </button>
                     ) : proposableOrderId ? (
-                      // MyOrdersPage з розгорнутим OPEN замовленням: пропонуємо його майстру
+                      // MyOrdersPage with an expanded OPEN order: propose it to the master
                       proposedMasterIds.has(master.user_id) ? (
                         <span className="flex-1 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-center text-xs font-semibold text-green-600">
-                          ✓ Запропоновано
+                          ✓ Proposed
                         </span>
                       ) : (
                         <button
@@ -195,23 +195,23 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
                           disabled={proposeMutation.isPending}
                           className="flex-1 rounded-lg bg-orange-500 px-3 py-2 text-xs font-semibold text-white hover:bg-orange-600 transition-colors disabled:opacity-50"
                         >
-                          Запропонувати
+                          Propose
                         </button>
                       )
                     ) : !hidePropose ? (
-                      // MyOrdersPage без розгорнутого замовлення: перейти до створення
+                      // MyOrdersPage without an expanded order: go to creation
                       <Link
                         href={`/orders/create?work_type_id=${workTypeId}&master_id=${master.user_id}`}
                         className="flex-1 rounded-lg bg-orange-500 px-3 py-2 text-center text-xs font-semibold text-white hover:bg-orange-600 transition-colors"
                       >
-                        Запропонувати
+                        Propose
                       </Link>
                     ) : null}
                     <Link
                       href={`/messages/${master.user_id}`}
                       className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-center text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
                     >
-                      Повідомлення
+                      Messages
                     </Link>
                   </div>
                 </div>
