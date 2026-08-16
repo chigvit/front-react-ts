@@ -1,16 +1,18 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { apiClient } from '@/shared/api/client'
 
-export const SearchOrdersDropdown = () => {
-  const [isOpen, setIsOpen] = useState(false)
+interface Props {
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
+  isActive: boolean
+}
+
+export const SearchOrdersDropdown = ({ isOpen, onOpenChange, isActive }: Props) => {
   const wrapperRef = useRef<HTMLDivElement>(null)
-  const pathname = usePathname()
-  const isActive = isOpen || pathname?.startsWith('/orders/search')
 
   const { data: categoriesData } = useQuery({
     queryKey: ['categories-dropdown'],
@@ -24,17 +26,17 @@ export const SearchOrdersDropdown = () => {
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setIsOpen(false)
+        onOpenChange(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [onOpenChange])
 
   return (
     <div className="relative" ref={wrapperRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => onOpenChange(!isOpen)}
         className={`flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
           isActive
             ? 'border-orange-500 bg-orange-50 text-orange-600'
@@ -50,7 +52,7 @@ export const SearchOrdersDropdown = () => {
           <div className="max-h-[28rem] overflow-y-auto py-2">
             <Link
               href="/orders/search"
-              onClick={() => setIsOpen(false)}
+              onClick={() => onOpenChange(false)}
               className="block px-4 py-2.5 text-left text-sm font-medium text-orange-600 hover:bg-orange-50 border-b border-gray-100"
             >
               🔍 Всі замовлення
@@ -59,7 +61,7 @@ export const SearchOrdersDropdown = () => {
               <Link
                 key={category.id}
                 href={`/orders/search?category_id=${category.id}`}
-                onClick={() => setIsOpen(false)}
+                onClick={() => onOpenChange(false)}
                 className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
               >
                 <span>{category.icon ?? '🔨'}</span>

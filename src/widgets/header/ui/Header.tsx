@@ -18,6 +18,25 @@ export const Header = () => {
   const menuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const pathname = usePathname()
+  const [openDropdown, setOpenDropdown] = useState<'create' | 'search' | null>(null)
+
+  // Сторінка, що відповідає поточному маршруту — використовується для
+  // підсвітки пункту меню, коли жодне випадне меню не відкрите.
+  const activePage: 'create' | 'search' | 'categories' | 'masters' | null =
+    pathname?.startsWith('/orders/create') ? 'create'
+    : pathname?.startsWith('/orders/search') ? 'search'
+    : pathname?.startsWith('/categories') ? 'categories'
+    : pathname?.startsWith('/masters') ? 'masters'
+    : null
+
+  // Єдине джерело правди для підсвітки — відкрите меню має пріоритет над
+  // маршрутом, і завжди підсвічений лише один пункт одночасно.
+  const activeNav = openDropdown ?? activePage
+
+  // Закриваємо відкрите меню при переході на іншу сторінку
+  useEffect(() => {
+    setOpenDropdown(null)
+  }, [pathname])
 
   const navLinkClass = (active: boolean) =>
     `rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
@@ -86,12 +105,20 @@ export const Header = () => {
 
         {/* Nav */}
         <nav className="hidden items-center gap-6 md:flex">
-          <CreateOrderDropdown />
-          <SearchOrdersDropdown />
-          <Link href="/categories" className={navLinkClass(!!pathname?.startsWith('/categories'))}>
+          <CreateOrderDropdown
+            isOpen={openDropdown === 'create'}
+            onOpenChange={(open) => setOpenDropdown(open ? 'create' : null)}
+            isActive={activeNav === 'create'}
+          />
+          <SearchOrdersDropdown
+            isOpen={openDropdown === 'search'}
+            onOpenChange={(open) => setOpenDropdown(open ? 'search' : null)}
+            isActive={activeNav === 'search'}
+          />
+          <Link href="/categories" className={navLinkClass(activeNav === 'categories')}>
             Категорії
           </Link>
-          <Link href="/masters" className={navLinkClass(!!pathname?.startsWith('/masters'))}>
+          <Link href="/masters" className={navLinkClass(activeNav === 'masters')}>
             Майстри
           </Link>
         </nav>
