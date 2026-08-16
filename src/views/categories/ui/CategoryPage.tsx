@@ -122,11 +122,11 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
           ) : (
             <>
               {/* Header */}
-              <div className="mb-6 flex items-center justify-between">
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                 <h1 className="text-2xl font-bold text-gray-800">
                   {selectedWorkType?.name}
                 </h1>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm text-gray-500">Radius:</span>
                   {[5, 10, 20, 50, 100].map(r => (
                     <button
