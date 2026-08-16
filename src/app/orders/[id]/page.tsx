@@ -1,5 +1,10 @@
 import { OrderDetailPage } from '@/views/orders/ui/OrderDetailPage'
 
-export default function OrderDetail({ params }: { params: { id: string } }) {
-  return <OrderDetailPage orderId={params.id} />
+interface Props {
+  params: Promise<{ id: string }>
+}
+
+export default async function OrderDetail({ params }: Props) {
+  const { id } = await params
+  return <OrderDetailPage orderId={id} />
 }
