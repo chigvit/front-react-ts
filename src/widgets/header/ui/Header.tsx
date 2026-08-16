@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/shared/api/client'
 import { useAuthStore } from '@/entities/user/model/userStore'
@@ -17,6 +17,14 @@ export const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const pathname = usePathname()
+
+  const navLinkClass = (active: boolean) =>
+    `rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+      active
+        ? 'border-orange-500 bg-orange-50 text-orange-600'
+        : 'border-transparent text-gray-600 hover:text-orange-500'
+    }`
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -80,10 +88,10 @@ export const Header = () => {
         <nav className="hidden items-center gap-6 md:flex">
           <CreateOrderDropdown />
           <SearchOrdersDropdown />
-          <Link href="/categories" className="text-sm text-gray-600 hover:text-orange-500">
+          <Link href="/categories" className={navLinkClass(!!pathname?.startsWith('/categories'))}>
             Категорії
           </Link>
-          <Link href="/masters" className="text-sm text-gray-600 hover:text-orange-500">
+          <Link href="/masters" className={navLinkClass(!!pathname?.startsWith('/masters'))}>
             Майстри
           </Link>
         </nav>
