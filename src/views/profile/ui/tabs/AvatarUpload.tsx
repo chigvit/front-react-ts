@@ -5,6 +5,8 @@ import { apiClient } from '@/shared/api/client'
 import { useAuthStore } from '@/entities/user/model/userStore'
 import { userApi } from '@/entities/user/api/userApi'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
+
 export const AvatarUpload = () => {
   const { user, setUser } = useAuthStore()
   const [uploading, setUploading] = useState(false)
@@ -45,7 +47,7 @@ export const AvatarUpload = () => {
   }
 
   const avatarUrl = previewUrl
-    ?? (user?.avatarUrl ? `http://localhost:8080${user.avatarUrl}` : null)
+    ?? (user?.avatarUrl ? `${API_URL}${user.avatarUrl}` : null)
 
   return (
     <div className="flex items-center gap-4">

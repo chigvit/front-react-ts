@@ -12,6 +12,8 @@ import { LogoutButton } from '@/features/auth/logout'
 
 type Tab = 'general' | 'work-types' | 'prices' | 'password'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
+
 export const ProfilePage = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -64,7 +66,7 @@ export const ProfilePage = () => {
         <div className="flex h-20 w-20 overflow-hidden rounded-full border border-gray-200">
           {user?.avatarUrl ? (
             <img
-              src={`http://localhost:8080${user.avatarUrl}`}
+              src={`${API_URL}${user.avatarUrl}`}
               alt="Avatar"
               className="h-full w-full object-cover"
             />

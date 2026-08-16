@@ -12,6 +12,8 @@ import { SearchOrdersDropdown } from './SearchOrdersDropdown'
 import { useUnreadStore } from '@/shared/model/unreadStore'
 import { useUnreadMessages } from '@/shared/hooks/useUnreadMessages'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
+
 export const Header = () => {
   const { isAuthenticated, user, _hasHydrated, logout, refreshToken } = useAuthStore()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -143,7 +145,7 @@ export const Header = () => {
   <div className="relative">
     <div className="flex h-8 w-8 overflow-hidden rounded-full border border-gray-200">
       {user?.avatarUrl ? (
-        <img src={`http://localhost:8080${user.avatarUrl}`} alt="Avatar" className="h-full w-full object-cover" />
+        <img src={`${API_URL}${user.avatarUrl}`} alt="Avatar" className="h-full w-full object-cover" />
       ) : (
         <div className="flex h-full w-full items-center justify-center bg-orange-100 text-sm font-bold text-orange-500">
           {user?.firstName?.[0]}{user?.lastName?.[0]}
@@ -275,7 +277,7 @@ export const Header = () => {
             <Link href="/profile" className="relative shrink-0" onClick={() => setMobileMenuOpen(false)}>
               <div className="flex h-8 w-8 overflow-hidden rounded-full border border-gray-200">
                 {user?.avatarUrl ? (
-                  <img src={`http://localhost:8080${user.avatarUrl}`} alt="Avatar" className="h-full w-full object-cover" />
+                  <img src={`${API_URL}${user.avatarUrl}`} alt="Avatar" className="h-full w-full object-cover" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-orange-100 text-sm font-bold text-orange-500">
                     {user?.firstName?.[0]}{user?.lastName?.[0]}

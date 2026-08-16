@@ -13,6 +13,8 @@ interface CategoryPageProps {
   id: number
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
+
 export const CategoryPage = ({ id }: CategoryPageProps) => {
   const searchParams = useSearchParams()
   const selectedWorkTypeId = searchParams.get('work_type')
@@ -165,7 +167,7 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
                         <div className="flex h-16 w-16 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-orange-100">
                           {master.avatar_url ? (
                             <img
-                              src={`http://localhost:8080${master.avatar_url}`}
+                              src={`${API_URL}${master.avatar_url}`}
                               alt="Avatar"
                               className="h-full w-full object-cover"
                             />

@@ -14,6 +14,7 @@ const MastersMap = dynamic(
 )
 
 const RADIUS_OPTIONS = [1, 2, 5, 10, 20, 50]
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
 export const MastersPage = () => {
   const { location } = useGeolocation()
@@ -111,7 +112,7 @@ export const MastersPage = () => {
                   <div className="flex h-12 w-12 overflow-hidden rounded-full border border-gray-200 bg-orange-100">
                     {master.avatar_url ? (
                       <img
-                        src={`http://localhost:8080${master.avatar_url}`}
+                        src={`${API_URL}${master.avatar_url}`}
                         alt="Avatar"
                         className="h-full w-full object-cover"
                       />
@@ -154,7 +155,7 @@ export const MastersPage = () => {
                   <div className="flex h-12 w-12 overflow-hidden rounded-full border border-gray-200 bg-orange-100">
                     {master.avatar_url ? (
                       <img
-                        src={`http://localhost:8080${master.avatar_url}`}
+                        src={`${API_URL}${master.avatar_url}`}
                         alt="Avatar"
                         className="h-full w-full object-cover"
                       />
