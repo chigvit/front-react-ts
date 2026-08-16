@@ -32,7 +32,11 @@ export const SearchOrdersDropdown = () => {
     <div className="relative" ref={wrapperRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-orange-500 transition-colors"
+        className={`flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+          isOpen
+            ? 'border-orange-500 bg-orange-50 text-orange-600'
+            : 'border-transparent text-gray-600 hover:text-orange-500'
+        }`}
       >
         Пошук замовлень
         <span className={`text-xs transition-transform ${isOpen ? 'rotate-180' : ''}`}>▾</span>

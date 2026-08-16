@@ -48,7 +48,11 @@ export const CreateOrderDropdown = () => {
     <div className="relative" ref={wrapperRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors"
+        className={`flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+          isOpen
+            ? 'border-orange-500 bg-orange-50 text-orange-600'
+            : 'border-orange-500 text-orange-500 hover:bg-orange-50'
+        }`}
       >
         Create Order
         <span className={`text-xs transition-transform ${isOpen ? 'rotate-180' : ''}`}>▾</span>
