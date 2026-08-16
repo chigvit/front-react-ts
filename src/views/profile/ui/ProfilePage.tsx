@@ -7,10 +7,11 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { GeneralTab } from './tabs/GeneralTab'
 import { WorkTypesTab } from './tabs/WorkTypesTab'
 import { PricesTab } from './tabs/PricesTab'
+import { PortfolioTab } from './tabs/PortfolioTab'
 import { ChangePasswordTab } from './tabs/ChangePasswordTab'
 import { LogoutButton } from '@/features/auth/logout'
 
-type Tab = 'general' | 'work-types' | 'prices' | 'password'
+type Tab = 'general' | 'work-types' | 'prices' | 'portfolio' | 'password'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
@@ -41,6 +42,7 @@ export const ProfilePage = () => {
     ...(isMaster ? [
       { id: 'work-types' as Tab, label: 'Work Types' },
       { id: 'prices' as Tab, label: 'Work Prices' },
+      { id: 'portfolio' as Tab, label: 'Portfolio' },
     ] : []),
     { id: 'password' as Tab, label: 'Change Password' },
   ]
@@ -113,6 +115,7 @@ export const ProfilePage = () => {
           <>
             <div className={activeTab !== 'work-types' ? 'hidden' : ''}><WorkTypesTab /></div>
             <div className={activeTab !== 'prices' ? 'hidden' : ''}><PricesTab /></div>
+            <div className={activeTab !== 'portfolio' ? 'hidden' : ''}><PortfolioTab /></div>
           </>
         )}
         <div className={activeTab !== 'password' ? 'hidden' : ''}><ChangePasswordTab /></div>

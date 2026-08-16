@@ -75,6 +75,15 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
     staleTime: Infinity,
   })
 
+  const { data: portfolioData } = useQuery({
+    queryKey: ['master-portfolio', masterId],
+    queryFn: async () => {
+      const res = await apiClient.get(`/api/v1/users/${masterId}/portfolio`)
+      return res.data.photos ?? []
+    },
+    staleTime: 60_000,
+  })
+
   const { data: ratingsData } = useQuery({
     queryKey: ['master-ratings', masterId],
     queryFn: async () => {
@@ -109,6 +118,7 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
   }
 
   const mp = profile.master_profile
+  const portfolioPhotos: string[] = portfolioData ?? []
   const workTypes: any[] = workTypesData ?? []
   const ratings: any[] = ratingsData?.ratings ?? []
   const avgRating: number = ratingsData?.average_rating ?? mp?.rating ?? 0
@@ -188,6 +198,22 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
 
         {/* Left column */}
         <div className="flex-1 min-w-0 rounded-2xl bg-white px-6 shadow-sm">
+
+          {/* Portfolio */}
+          {portfolioPhotos.length > 0 && (
+            <Section title="Portfolio">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {portfolioPhotos.map((url) => (
+                  <img
+                    key={url}
+                    src={`${API_URL}${url}`}
+                    alt="Portfolio"
+                    className="aspect-square w-full rounded-xl border border-gray-100 object-cover"
+                  />
+                ))}
+              </div>
+            </Section>
+          )}
 
           {/* About */}
           {(mp?.bio || mp?.services_description) && (
