@@ -150,7 +150,8 @@ export const SupportChatWidget = () => {
   }
 
   const handleStart = () => {
-    if (!name.trim() || !email.trim() || !message.trim()) return
+    if (!message.trim()) return
+    if (!isAuthenticated() && (!name.trim() || !email.trim())) return
     createMutation.mutate()
   }
 
@@ -176,19 +177,23 @@ export const SupportChatWidget = () => {
               <p className="text-sm text-gray-500">
                 Have a question? Send us a message and we&apos;ll reply here.
               </p>
-              <input
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
-              />
+              {!isAuthenticated() && (
+                <>
+                  <input
+                    placeholder="Your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+                  />
+                </>
+              )}
               <input
                 placeholder="Subject — optional"
                 value={subject}
@@ -204,7 +209,11 @@ export const SupportChatWidget = () => {
               />
               <button
                 onClick={handleStart}
-                disabled={!name.trim() || !email.trim() || !message.trim() || createMutation.isPending}
+                disabled={
+                  !message.trim() ||
+                  (!isAuthenticated() && (!name.trim() || !email.trim())) ||
+                  createMutation.isPending
+                }
                 className="rounded-lg bg-orange-500 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:opacity-40"
               >
                 {createMutation.isPending ? 'Sending...' : 'Send'}
