@@ -4,6 +4,7 @@ import './globals.css'
 import { Providers } from './providers'
 import { Header } from '@/widgets/header/ui/Header'
 import { Footer } from '@/widgets/footer/ui/Footer'
+import { SupportChatWidget } from '@/widgets/support-chat/ui/SupportChatWidget'
 import { RegisterServiceWorker } from './register-sw'
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
@@ -54,6 +55,7 @@ export default function RootLayout({
             </main>
             <Footer />
           </div>
+          <SupportChatWidget />
         </Providers>
       </body>
     </html>
