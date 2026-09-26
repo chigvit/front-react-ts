@@ -75,7 +75,13 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
         <span>→</span>
         <Link href="/categories" className="hover:text-orange-500">Categories</Link>
         <span>→</span>
-        <span className="text-gray-800">{categoryData?.name_en || categoryData?.name}</span>
+        {selectedWorkType ? (
+          <Link href={`/categories/${id}`} className="hover:text-orange-500">
+            {categoryData?.name_en || categoryData?.name}
+          </Link>
+        ) : (
+          <span className="text-gray-800">{categoryData?.name_en || categoryData?.name}</span>
+        )}
         {selectedWorkType && (
           <>
             <span>→</span>
