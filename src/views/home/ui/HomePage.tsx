@@ -110,7 +110,7 @@ export const HomePage = () => {
                       </div>
                     </Link>
 
-                    <ul className="space-y-1">
+                    <ul className="hidden space-y-1 sm:block">
                       {visibleWorkTypes.map((wt: any) => (
                         <li key={wt.id}>
                           <Link
@@ -127,7 +127,7 @@ export const HomePage = () => {
                     {category.workTypes.length > INITIAL_SHOW && (
                       <button
                         onClick={() => toggleExpand(category.id)}
-                        className="mt-3 flex items-center gap-1 text-sm text-orange-500 hover:text-orange-600 font-medium"
+                        className="mt-3 hidden items-center gap-1 text-sm text-orange-500 hover:text-orange-600 font-medium sm:flex"
                       >
                         {isExpanded
                           ? 'Show less ▲'
