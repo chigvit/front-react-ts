@@ -8,7 +8,7 @@ import { apiClient } from '@/shared/api/client'
 import { Spinner } from '@/shared/ui/Spinner'
 import { Button } from '@/shared/ui/Button'
 
-const INITIAL_SHOW = 5
+const INITIAL_SHOW = 3
 
 export const HomePage = () => {
   const router = useRouter()
