@@ -44,7 +44,7 @@ export const ProfilePage = () => {
       { id: 'prices' as Tab, label: 'Work Prices' },
       { id: 'portfolio' as Tab, label: 'Portfolio' },
     ] : []),
-    { id: 'password' as Tab, label: 'Change Password' },
+    ...(user?.hasPassword !== false ? [{ id: 'password' as Tab, label: 'Change Password' }] : []),
   ]
 
   const setActiveTab = (tab: Tab) => {
@@ -118,7 +118,9 @@ export const ProfilePage = () => {
             <div className={activeTab !== 'portfolio' ? 'hidden' : ''}><PortfolioTab /></div>
           </>
         )}
-        <div className={activeTab !== 'password' ? 'hidden' : ''}><ChangePasswordTab /></div>
+        {user?.hasPassword !== false && (
+          <div className={activeTab !== 'password' ? 'hidden' : ''}><ChangePasswordTab /></div>
+        )}
       </div>
 
       {/* Logout */}

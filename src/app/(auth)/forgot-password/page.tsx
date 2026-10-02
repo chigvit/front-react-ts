@@ -18,6 +18,7 @@ type FormData = z.infer<typeof schema>
 
 export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false)
+  const [isOAuthOnly, setIsOAuthOnly] = useState(false)
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -29,7 +30,8 @@ export default function ForgotPasswordPage() {
     setError(null)
     setIsPending(true)
     try {
-      await apiClient.post('/api/v1/auth/forgot-password', { email: data.email })
+      const res = await apiClient.post('/api/v1/auth/forgot-password', { email: data.email })
+      setIsOAuthOnly(!!res.data.is_oauth_only)
       setSent(true)
     } catch {
       setError('Failed to send reset email. Please try again.')
@@ -43,11 +45,23 @@ export default function ForgotPasswordPage() {
       <Card className="w-full max-w-md">
         {sent ? (
           <div className="text-center">
-            <div className="mb-4 text-5xl">📧</div>
-            <h1 className="mb-2 text-2xl font-bold text-gray-800">Check your email</h1>
-            <p className="mb-4 text-gray-600">
-              We sent a password reset link to your email address.
-            </p>
+            {isOAuthOnly ? (
+              <>
+                <div className="mb-4 text-5xl">🔑</div>
+                <h1 className="mb-2 text-2xl font-bold text-gray-800">This account uses Google</h1>
+                <p className="mb-4 text-gray-600">
+                  This account signs in with Google, so it has no password to reset. Use the "Continue with Google" button on the login page instead.
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="mb-4 text-5xl">📧</div>
+                <h1 className="mb-2 text-2xl font-bold text-gray-800">Check your email</h1>
+                <p className="mb-4 text-gray-600">
+                  We sent a password reset link to your email address.
+                </p>
+              </>
+            )}
             <Link href="/login" className="text-orange-500 hover:underline">
               Back to login
             </Link>

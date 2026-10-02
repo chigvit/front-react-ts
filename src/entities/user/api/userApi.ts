@@ -13,6 +13,7 @@ const toProfile = (data: any): UserProfile => ({
   isEmailVerified: data.is_email_verified,
   postcode: data.postcode,
   languages: data.languages ?? [],
+  hasPassword: data.has_password ?? true,
   masterProfile: data.master_profile ? {
     bio: data.master_profile.bio,
     experienceYears: data.master_profile.experience_years,

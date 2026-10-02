@@ -22,6 +22,7 @@ export interface User {
   isEmailVerified: boolean
   postcode?: string
   languages?: string[]
+  hasPassword: boolean
 }
 
 export interface MasterProfileData {
