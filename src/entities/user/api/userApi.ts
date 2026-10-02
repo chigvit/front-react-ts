@@ -50,6 +50,16 @@ export const userApi = {
     return res.data
   },
 
+  oauthLoginGoogle: async (idToken: string): Promise<AuthResponse> => {
+    const res = await apiClient.post('/api/v1/auth/oauth/google', { id_token: idToken })
+    return {
+      accessToken: res.data.access_token,
+      refreshToken: res.data.refresh_token,
+      userId: res.data.user_id,
+      userRole: res.data.user_role,
+    }
+  },
+
   logout: async (refreshToken: string): Promise<void> => {
     await apiClient.post('/api/v1/auth/logout', { refresh_token: refreshToken })
   },

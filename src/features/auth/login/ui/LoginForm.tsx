@@ -10,6 +10,7 @@ import { Input } from '@/shared/ui/Input'
 import { useRouter } from 'next/navigation'
 import { userApi } from '@/entities/user/api/userApi'
 import { useAuthStore } from '@/entities/user/model/userStore'
+import { GoogleSignInButton } from '@/features/auth/google'
 
 const schema = z.object({
   email: z.string().email('Invalid email format'),
@@ -109,6 +110,14 @@ export const LoginForm = ({ redirectTo = '/' }: LoginFormProps) => {
       <Button type="submit" loading={isPending} className="w-full">
         Log in
       </Button>
+
+      <div className="flex items-center gap-3">
+        <div className="h-px flex-1 bg-gray-200" />
+        <span className="text-xs text-gray-400">OR</span>
+        <div className="h-px flex-1 bg-gray-200" />
+      </div>
+
+      <GoogleSignInButton redirectTo={redirectTo} />
     </form>
   )
 }

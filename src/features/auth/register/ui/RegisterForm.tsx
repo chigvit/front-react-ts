@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { Button } from '@/shared/ui/Button'
 import { Input } from '@/shared/ui/Input'
 import { useRegister } from '../model/useRegister'
+import { GoogleSignInButton } from '@/features/auth/google'
 
 const schema = z.object({
   email: z
@@ -111,6 +112,14 @@ export const RegisterForm = () => {
       <Button type="submit" loading={isPending} className="w-full">
         Sign up
       </Button>
+
+      <div className="flex items-center gap-3">
+        <div className="h-px flex-1 bg-gray-200" />
+        <span className="text-xs text-gray-400">OR</span>
+        <div className="h-px flex-1 bg-gray-200" />
+      </div>
+
+      <GoogleSignInButton />
     </form>
   )
 }
