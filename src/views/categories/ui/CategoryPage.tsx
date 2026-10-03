@@ -8,12 +8,11 @@ import { apiClient } from '@/shared/api/client'
 import { Spinner } from '@/shared/ui/Spinner'
 import { useGeolocation } from '@/shared/hooks/useGeolocation'
 import { MasterProfileContent } from '@/views/masters/ui/MasterProfileContent'
+import { getAvatarUrl } from '@/shared/lib/avatarUrl'
 
 interface CategoryPageProps {
   id: number
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
 export const CategoryPage = ({ id }: CategoryPageProps) => {
   const searchParams = useSearchParams()
@@ -153,7 +152,7 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
                       <div className="flex h-12 w-12 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-orange-100">
                         {master.avatar_url ? (
                           <img
-                            src={`${API_URL}${master.avatar_url}`}
+                            src={getAvatarUrl(master.avatar_url) ?? undefined}
                             alt="Avatar"
                             className="h-full w-full object-cover"
                           />

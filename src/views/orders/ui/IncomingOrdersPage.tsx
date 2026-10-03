@@ -13,6 +13,7 @@ import { RateUserForm } from '@/widgets/rate-user/ui/RateUserForm'
 import { useUnreadMessages } from '@/shared/hooks/useUnreadMessages'
 import { useUnreadStore } from '@/shared/model/unreadStore'
 import { markAsRead } from '@/shared/lib/unreadMessages'
+import { getAvatarUrl } from '@/shared/lib/avatarUrl'
 import { getSeenOrderIds, markOrderSeen } from '@/shared/lib/seenOrders'
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'info' }> = {
@@ -248,7 +249,7 @@ export const IncomingOrdersPage = () => {
                           <div className="mt-2 flex items-center gap-2">
                             {customer.avatar_url ? (
                               <img
-                                src={`${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'}${customer.avatar_url}`}
+                                src={getAvatarUrl(customer.avatar_url) ?? undefined}
                                 alt=""
                                 className="h-6 w-6 rounded-full object-cover"
                               />

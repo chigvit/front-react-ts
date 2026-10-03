@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { apiClient } from '@/shared/api/client'
 import { Spinner } from '@/shared/ui/Spinner'
 import { Lightbox } from '@/shared/ui/Lightbox'
+import { getAvatarUrl } from '@/shared/lib/avatarUrl'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
@@ -136,7 +137,7 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
             <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-gray-100 bg-orange-100 sm:h-24 sm:w-24">
               {profile.avatar_url ? (
                 <img
-                  src={`${API_URL}${profile.avatar_url}`}
+                  src={getAvatarUrl(profile.avatar_url) ?? undefined}
                   alt=""
                   className="h-full w-full object-cover"
                 />

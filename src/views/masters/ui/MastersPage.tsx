@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { apiClient } from '@/shared/api/client'
 import { Spinner } from '@/shared/ui/Spinner'
 import { useGeolocation } from '@/shared/hooks/useGeolocation'
+import { getAvatarUrl } from '@/shared/lib/avatarUrl'
 
 const MastersMap = dynamic(
   () => import('./MastersMap').then(mod => mod.MastersMap),
@@ -14,7 +15,6 @@ const MastersMap = dynamic(
 )
 
 const RADIUS_OPTIONS = [1, 2, 5, 10, 20, 50]
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
 export const MastersPage = () => {
   const { location } = useGeolocation()
@@ -112,7 +112,7 @@ export const MastersPage = () => {
                   <div className="flex h-12 w-12 overflow-hidden rounded-full border border-gray-200 bg-orange-100">
                     {master.avatar_url ? (
                       <img
-                        src={`${API_URL}${master.avatar_url}`}
+                        src={getAvatarUrl(master.avatar_url) ?? undefined}
                         alt="Avatar"
                         className="h-full w-full object-cover"
                       />
@@ -155,7 +155,7 @@ export const MastersPage = () => {
                   <div className="flex h-12 w-12 overflow-hidden rounded-full border border-gray-200 bg-orange-100">
                     {master.avatar_url ? (
                       <img
-                        src={`${API_URL}${master.avatar_url}`}
+                        src={getAvatarUrl(master.avatar_url) ?? undefined}
                         alt="Avatar"
                         className="h-full w-full object-cover"
                       />

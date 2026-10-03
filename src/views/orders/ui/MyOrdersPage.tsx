@@ -14,8 +14,7 @@ import { RateUserForm } from '@/widgets/rate-user/ui/RateUserForm'
 import { useUnreadMessages } from '@/shared/hooks/useUnreadMessages'
 import { useUnreadStore } from '@/shared/model/unreadStore'
 import { markAsRead } from '@/shared/lib/unreadMessages'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
+import { getAvatarUrl } from '@/shared/lib/avatarUrl'
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'info' }> = {
   OPEN:        { label: 'Open',              variant: 'info' },
@@ -218,7 +217,7 @@ export const MyOrdersPage = () => {
                             >
                               {master.avatar_url ? (
                                 <img
-                                  src={`${API_URL}${master.avatar_url}`}
+                                  src={getAvatarUrl(master.avatar_url) ?? undefined}
                                   alt=""
                                   className="h-6 w-6 rounded-full object-cover"
                                 />
@@ -364,7 +363,7 @@ export const MyOrdersPage = () => {
                                         >
                                           {master?.avatar_url ? (
                                             <img
-                                              src={`${API_URL}${master.avatar_url}`}
+                                              src={getAvatarUrl(master.avatar_url) ?? undefined}
                                               alt=""
                                               className="h-6 w-6 rounded-full object-cover"
                                             />

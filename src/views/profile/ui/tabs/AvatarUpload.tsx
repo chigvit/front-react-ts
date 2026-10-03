@@ -4,8 +4,7 @@ import { useState, useRef } from 'react'
 import { apiClient } from '@/shared/api/client'
 import { useAuthStore } from '@/entities/user/model/userStore'
 import { userApi } from '@/entities/user/api/userApi'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
+import { getAvatarUrl } from '@/shared/lib/avatarUrl'
 
 export const AvatarUpload = () => {
   const { user, setUser } = useAuthStore()
@@ -46,8 +45,7 @@ export const AvatarUpload = () => {
     }
   }
 
-  const avatarUrl = previewUrl
-    ?? (user?.avatarUrl ? `${API_URL}${user.avatarUrl}` : null)
+  const avatarUrl = previewUrl ?? getAvatarUrl(user?.avatarUrl)
 
   return (
     <div className="flex items-center gap-4">

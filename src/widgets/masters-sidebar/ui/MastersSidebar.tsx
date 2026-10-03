@@ -6,8 +6,7 @@ import Link from 'next/link'
 import { apiClient } from '@/shared/api/client'
 import { useGeolocation } from '@/shared/hooks/useGeolocation'
 import { Spinner } from '@/shared/ui/Spinner'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
+import { getAvatarUrl } from '@/shared/lib/avatarUrl'
 
 interface Props {
   workTypeId: number
@@ -99,7 +98,7 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
                   <div className="mb-3 flex items-center gap-3">
                     <div className="flex h-11 w-11 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-orange-100">
                       {master.avatar_url ? (
-                        <img src={`${API_URL}${master.avatar_url}`} alt="" className="h-full w-full object-cover" />
+                        <img src={getAvatarUrl(master.avatar_url) ?? undefined} alt="" className="h-full w-full object-cover" />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-sm font-bold text-orange-500">
                           {master.first_name?.[0]}{master.last_name?.[0]}
