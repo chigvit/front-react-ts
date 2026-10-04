@@ -213,7 +213,7 @@ export const Header = () => {
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
                     >
-                      🔍 Search Orders
+                      🔍 Search Work
                     </Link>
 
                     <Link
@@ -308,7 +308,7 @@ export const Header = () => {
               🛠️ Create Order
             </Link>
             <Link href="/orders/search" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-orange-50">
-              🔍 Search Orders
+              🔍 Search Work
             </Link>
             <Link href="/categories" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-orange-50">
               📂 Categories

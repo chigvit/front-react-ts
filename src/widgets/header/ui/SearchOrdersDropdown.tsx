@@ -47,7 +47,7 @@ export const SearchOrdersDropdown = ({ isOpen, onOpenChange, isActive }: Props) 
             : 'border-transparent text-gray-600 hover:text-orange-500'
         }`}
       >
-        Search Orders
+        Search Work
         <span className={`text-xs transition-transform ${isOpen ? 'rotate-180' : ''}`}>▾</span>
       </button>
 
