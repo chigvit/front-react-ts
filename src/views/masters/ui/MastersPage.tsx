@@ -93,7 +93,7 @@ export const MastersPage = () => {
       {/* Content */}
       {view === 'map' ? (
         <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
-          <div className="h-[50vh] shrink-0 md:h-auto md:flex-1">
+          <div className="relative z-0 h-[50vh] shrink-0 md:h-auto md:flex-1">
             <MastersMap
               masters={masters}
               userLocation={location}
