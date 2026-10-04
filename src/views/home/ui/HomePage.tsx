@@ -111,7 +111,18 @@ export const HomePage = () => {
           <div className="relative hidden h-60 lg:block">
             <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-orange-100 via-blue-100 to-purple-100" />
             <span className="absolute left-5 top-5 text-5xl drop-shadow-sm">🔧</span>
-            <span className="absolute right-8 top-8 text-6xl drop-shadow-sm">🚚</span>
+            <svg viewBox="0 0 200 120" className="absolute right-4 top-6 w-40 drop-shadow-sm">
+              <rect x="5" y="90" width="175" height="6" rx="3" fill="#E2E8F0" />
+              <rect x="10" y="20" width="110" height="70" rx="8" fill="#F97316" />
+              <rect x="10" y="20" width="110" height="18" rx="8" fill="#FDBA74" />
+              <path d="M120 45 H165 Q175 45 175 55 V90 H120 Z" fill="#1E293B" />
+              <path d="M128 52 H158 Q164 52 164 58 V70 H128 Z" fill="#BAE6FD" />
+              <rect x="118" y="88" width="62" height="8" rx="4" fill="#0F172A" />
+              <circle cx="45" cy="98" r="14" fill="#1E293B" />
+              <circle cx="45" cy="98" r="6" fill="#CBD5E1" />
+              <circle cx="150" cy="98" r="14" fill="#1E293B" />
+              <circle cx="150" cy="98" r="6" fill="#CBD5E1" />
+            </svg>
             <span className="absolute bottom-8 left-12 text-6xl drop-shadow-sm">🧹</span>
             <span className="absolute bottom-5 right-5 text-5xl drop-shadow-sm">🎨</span>
             <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-7xl drop-shadow-sm">📚</span>
