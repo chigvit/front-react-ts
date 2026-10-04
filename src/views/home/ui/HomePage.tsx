@@ -273,33 +273,6 @@ export const HomePage = () => {
           )}
         </div>
       </section>
-
-      {/* How it works */}
-      <section className="bg-gray-50 py-12">
-        <div className="mx-auto max-w-5xl px-4">
-          <h2 className="mb-8 text-center text-2xl font-bold text-gray-800">
-            How it works
-          </h2>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {[
-              { icon: '📝', title: 'Create an order', desc: 'Describe what needs to be done and set your budget' },
-              { icon: '👷', title: 'Get responses', desc: 'Masters will respond and offer their price' },
-              { icon: '✅', title: 'Choose a master', desc: 'Select the best one and get the result' },
-            ].map((step, i) => (
-              <div key={i} className="text-center">
-                <div className="mb-4 text-5xl">{step.icon}</div>
-                <h3 className="mb-2 text-lg font-semibold text-gray-800">{step.title}</h3>
-                <p className="text-gray-600">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <Link href="/orders/create">
-              <Button size="lg">Create Order</Button>
-            </Link>
-          </div>
-        </div>
-      </section>
     </div>
   )
 }
