@@ -108,24 +108,90 @@ export const HomePage = () => {
           </div>
 
           {/* Decorative illustration */}
-          <div className="relative hidden h-60 lg:block">
-            <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-orange-100 via-blue-100 to-purple-100" />
-            <span className="absolute left-5 top-5 text-5xl drop-shadow-sm">🔧</span>
-            <svg viewBox="0 0 200 120" className="absolute right-4 top-6 w-40 drop-shadow-sm">
-              <rect x="5" y="90" width="175" height="6" rx="3" fill="#E2E8F0" />
-              <rect x="10" y="20" width="110" height="70" rx="8" fill="#F97316" />
-              <rect x="10" y="20" width="110" height="18" rx="8" fill="#FDBA74" />
-              <path d="M120 45 H165 Q175 45 175 55 V90 H120 Z" fill="#1E293B" />
-              <path d="M128 52 H158 Q164 52 164 58 V70 H128 Z" fill="#BAE6FD" />
-              <rect x="118" y="88" width="62" height="8" rx="4" fill="#0F172A" />
-              <circle cx="45" cy="98" r="14" fill="#1E293B" />
-              <circle cx="45" cy="98" r="6" fill="#CBD5E1" />
-              <circle cx="150" cy="98" r="14" fill="#1E293B" />
-              <circle cx="150" cy="98" r="6" fill="#CBD5E1" />
+          <div className="relative hidden h-64 overflow-hidden rounded-[2.5rem] lg:block">
+            <svg viewBox="0 0 400 220" className="h-full w-full">
+              <rect width="400" height="220" fill="#EEF2FF" />
+
+              {/* soft background blobs */}
+              <circle cx="310" cy="65" r="75" fill="#DBEAFE" opacity="0.7" />
+              <circle cx="95" cy="155" r="65" fill="#E0E7FF" opacity="0.6" />
+
+              {/* dot clusters */}
+              {[0, 1, 2, 3].map(row => (
+                [0, 1, 2, 3].map(col => (
+                  <circle key={`d1-${row}-${col}`} cx={18 + col * 12} cy={18 + row * 12} r="2" fill="#C7D2FE" />
+                ))
+              ))}
+              {[0, 1, 2, 3].map(row => (
+                [0, 1, 2, 3].map(col => (
+                  <circle key={`d2-${row}-${col}`} cx={352 + col * 12} cy={168 + row * 12} r="2" fill="#C7D2FE" />
+                ))
+              ))}
+
+              {/* spray bottle */}
+              <g transform="translate(40,30)">
+                <rect x="10" y="38" width="30" height="48" rx="7" fill="#60A5FA" />
+                <rect x="18" y="20" width="14" height="20" rx="3" fill="#60A5FA" />
+                <path d="M30 18 L48 8 L52 16 L34 26 Z" fill="#818CF8" />
+                <rect x="46" y="4" width="10" height="7" rx="2" fill="#818CF8" />
+                <path d="M58 2 L66 -4" stroke="#A5B4FC" strokeWidth="3" strokeLinecap="round" />
+                <path d="M60 10 L70 7" stroke="#A5B4FC" strokeWidth="3" strokeLinecap="round" />
+                <circle cx="25" cy="58" r="6" fill="#BFDBFE" />
+              </g>
+
+              {/* truck */}
+              <g transform="translate(225,35)">
+                <path d="M-18 55 H-4" stroke="#A5B4FC" strokeWidth="3" strokeLinecap="round" />
+                <path d="M-14 45 H-2" stroke="#A5B4FC" strokeWidth="3" strokeLinecap="round" />
+                <rect x="2" y="90" width="150" height="6" rx="3" fill="#C7D2FE" />
+                <rect x="6" y="18" width="95" height="65" rx="8" fill="#60A5FA" />
+                <rect x="6" y="18" width="95" height="16" rx="8" fill="#93C5FD" />
+                <path d="M101 40 H142 Q151 40 151 49 V83 H101 Z" fill="#1E293B" />
+                <path d="M108 46 H134 Q139 46 139 51 V62 H108 Z" fill="#BAE6FD" />
+                <rect x="100" y="81" width="54" height="7" rx="3" fill="#0F172A" />
+                <circle cx="38" cy="90" r="12" fill="#1E293B" />
+                <circle cx="38" cy="90" r="5" fill="#CBD5E1" />
+                <circle cx="130" cy="90" r="12" fill="#1E293B" />
+                <circle cx="130" cy="90" r="5" fill="#CBD5E1" />
+              </g>
+
+              {/* open book */}
+              <g transform="translate(95,135)">
+                <path d="M0 10 L48 0 V55 L0 62 Z" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="2" />
+                <path d="M96 10 L48 0 V55 L96 62 Z" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="2" />
+                <path d="M8 16 L40 9" stroke="#E2E8F0" strokeWidth="2" />
+                <path d="M8 26 L40 19" stroke="#E2E8F0" strokeWidth="2" />
+                <path d="M8 36 L40 29" stroke="#E2E8F0" strokeWidth="2" />
+                <path d="M56 9 L88 16" stroke="#E2E8F0" strokeWidth="2" />
+                <path d="M56 19 L88 26" stroke="#E2E8F0" strokeWidth="2" />
+                <path d="M56 29 L88 36" stroke="#E2E8F0" strokeWidth="2" />
+                <rect x="44" y="0" width="8" height="58" fill="#60A5FA" />
+              </g>
+
+              {/* wrench + gear */}
+              <g transform="translate(255,120)">
+                <g fill="#94A3B8">
+                  <circle cx="45" cy="45" r="30" />
+                  {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => (
+                    <rect
+                      key={angle}
+                      x="41"
+                      y="4"
+                      width="8"
+                      height="12"
+                      rx="2"
+                      transform={`rotate(${angle} 45 45)`}
+                    />
+                  ))}
+                </g>
+                <circle cx="45" cy="45" r="13" fill="#EEF2FF" />
+                <path
+                  d="M4 70 L34 40 A10 10 0 1 1 42 48 L12 78 A6 6 0 0 1 4 70 Z"
+                  fill="#475569"
+                />
+                <circle cx="38" cy="44" r="4" fill="#EEF2FF" />
+              </g>
             </svg>
-            <span className="absolute bottom-8 left-12 text-6xl drop-shadow-sm">🧹</span>
-            <span className="absolute bottom-5 right-5 text-5xl drop-shadow-sm">🎨</span>
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-7xl drop-shadow-sm">📚</span>
           </div>
         </div>
       </section>
