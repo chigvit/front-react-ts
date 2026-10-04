@@ -15,13 +15,13 @@ const notoKR = Noto_Sans_KR({
 })
 
 export const metadata: Metadata = {
-  title: 'MasterOnline - Service Booking Platform',
+  title: 'Pop To The Work - Service Booking Platform',
   description: 'Find a master for any job',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'MasterOnline',
+    title: 'Pop To The Work',
   },
   icons: {
     icon: [

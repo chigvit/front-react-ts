@@ -6,7 +6,7 @@ export const Footer = () => {
       <div className="mx-auto max-w-7xl px-4">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div>
-            <span className="text-lg font-bold text-orange-500">MasterOnline</span>
+            <span className="text-lg font-bold text-orange-500">Pop To The Work</span>
             <p className="mt-2 text-sm text-gray-600">
               Online service booking platform
             </p>
@@ -32,7 +32,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-8 border-t border-gray-200 pt-4 text-center text-sm text-gray-500">
-          © 2026 MasterOnline. All rights reserved.
+          © 2026 Pop To The Work. All rights reserved.
         </div>
       </div>
     </footer>

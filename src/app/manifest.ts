@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'MasterOnline - Service Booking Platform',
-    short_name: 'MasterOnline',
+    name: 'Pop To The Work - Service Booking Platform',
+    short_name: 'Pop To The Work',
     description: 'Find a master for any job',
     start_url: '/',
     display: 'standalone',

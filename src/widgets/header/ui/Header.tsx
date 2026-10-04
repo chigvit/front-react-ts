@@ -107,8 +107,8 @@ export const Header = () => {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-1.5 sm:gap-2">
-          <span className="text-xl font-bold text-orange-500 sm:text-2xl">Master</span>
-          <span className="text-xl font-bold text-gray-800 sm:text-2xl">Online</span>
+          <span className="text-xl font-bold text-orange-500 sm:text-2xl">Pop To The</span>
+          <span className="text-xl font-bold text-gray-800 sm:text-2xl">Work</span>
         </Link>
 
         {/* Nav */}
