@@ -76,10 +76,10 @@ export const HomePage = () => {
       <section className="overflow-hidden bg-blue-50/60 py-14 sm:py-16">
         <div className="mx-auto grid max-w-5xl grid-cols-1 items-center gap-10 px-4 lg:grid-cols-2">
           <div>
-            <h1 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl">
+            <h1 className="text-2xl font-bold leading-tight text-gray-900 sm:text-3xl">
               Every service you need<br />— in one place
             </h1>
-            <p className="mt-4 max-w-xl text-lg text-gray-500">
+            <p className="mt-4 max-w-xl text-sm text-gray-500">
               Home repair &bull; Cleaning &bull; Design &bull; Tutoring &bull; Moving
               and 20+ more categories for your home, business and everyday life.
             </p>
