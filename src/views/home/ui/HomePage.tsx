@@ -76,7 +76,7 @@ export const HomePage = () => {
       <section className="overflow-hidden bg-blue-50/60 py-14 sm:py-16">
         <div className="mx-auto grid max-w-5xl grid-cols-1 items-center gap-10 px-4 lg:grid-cols-2">
           <div>
-            <h1 className="text-4xl font-bold leading-tight text-gray-900 sm:text-5xl">
+            <h1 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl">
               Every service you need<br />— in one place
             </h1>
             <p className="mt-4 max-w-xl text-lg text-gray-500">
