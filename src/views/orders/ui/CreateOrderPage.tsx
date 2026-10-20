@@ -13,6 +13,8 @@ import { Input } from '@/shared/ui/Input'
 import { Button } from '@/shared/ui/Button'
 import { Spinner } from '@/shared/ui/Spinner'
 import { MastersSidebar } from '@/widgets/masters-sidebar/ui/MastersSidebar'
+import { guestFlowErrorMessage } from '@/shared/lib/authErrors'
+import { WorkTypeSuggestions } from '@/features/order/suggest-work-type'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 const MAX_ORDER_PHOTOS = 3
@@ -46,7 +48,9 @@ export const CreateOrderPage = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { isAuthenticated, _hasHydrated, setAuth } = useAuthStore()
-  const workTypeId = searchParams?.get('work_type_id') ?? null
+  const [workTypeId, setWorkTypeId] = useState<string | null>(
+    searchParams?.get('work_type_id') ?? null
+  )
 
   const [selectedMasterId, setSelectedMasterId] = useState<string | null>(
     searchParams?.get('master_id') ?? null
@@ -81,6 +85,19 @@ export const CreateOrderPage = () => {
   const orderForm = useForm<OrderFormData>({ resolver: zodResolver(orderSchema) })
   const guestForm = useForm<GuestFormData>({ resolver: zodResolver(guestSchema) })
   const loginForm = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) })
+
+  const orderText = [orderForm.watch('title'), orderForm.watch('description')]
+    .filter(Boolean)
+    .join('. ')
+
+  // Switching the service from a suggestion keeps the URL in sync, so a
+  // refresh or the masters sidebar see the same work type.
+  const selectWorkType = (id: number) => {
+    setWorkTypeId(String(id))
+    const params = new URLSearchParams(searchParams?.toString() ?? '')
+    params.set('work_type_id', String(id))
+    router.replace(`/orders/create?${params.toString()}`, { scroll: false })
+  }
 
   const createOrder = async (orderData: OrderFormData) => {
     const res = await apiClient.post('/api/v1/orders', {
@@ -126,6 +143,10 @@ export const CreateOrderPage = () => {
   const handleSubmit = async () => {
     const orderValid = await orderForm.trigger()
     if (!orderValid) return
+    if (!workTypeId) {
+      setError('Please choose a service type for your order.')
+      return
+    }
 
     const orderData = orderForm.getValues()
 
@@ -184,8 +205,8 @@ export const CreateOrderPage = () => {
       setSavedOrderData(orderData)
       setSavedGuestPhone(guestData.phone)
       setStep('verify')
-    } catch {
-      setError('Failed to register. Please try again.')
+    } catch (err: any) {
+      setError(guestFlowErrorMessage(err, 'Failed to register. Please try again.'))
     } finally {
       setIsPending(false)
     }
@@ -219,7 +240,7 @@ export const CreateOrderPage = () => {
       if (msg.includes('expired')) {
         setError('Code expired.')
       } else {
-        setError('Incorrect code. Please try again.')
+        setError(guestFlowErrorMessage(err, 'Incorrect code. Please try again.'))
       }
     } finally {
       setIsPending(false)
@@ -241,8 +262,8 @@ export const CreateOrderPage = () => {
       setDevCode(res.data.dev_code)
       setSmsCode('')
       setResendMessage('A new code has been sent.')
-    } catch {
-      setError('Failed to resend code. Please try again.')
+    } catch (err: any) {
+      setError(guestFlowErrorMessage(err, 'Failed to resend code. Please try again.'))
     } finally {
       setIsResending(false)
     }
@@ -367,6 +388,11 @@ export const CreateOrderPage = () => {
                   <p className="mt-1 text-xs text-red-500">{orderForm.formState.errors.description.message}</p>
                 )}
               </div>
+              <WorkTypeSuggestions
+                text={orderText}
+                selectedWorkTypeId={workTypeId ? Number(workTypeId) : null}
+                onSelect={selectWorkType}
+              />
               <Input
                 label="Address / Postcode"
                 placeholder="E.g. LS1 4DY"

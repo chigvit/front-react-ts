@@ -126,9 +126,6 @@ export const Header = () => {
           <Link href="/categories" className={navLinkClass(activeNav === 'categories')}>
             Categories
           </Link>
-          <Link href="/masters" className={navLinkClass(activeNav === 'masters')}>
-            Masters
-          </Link>
         </nav>
 
         {/* Auth — desktop only, mobile has its own compact block below */}
@@ -312,9 +309,6 @@ export const Header = () => {
             </Link>
             <Link href="/categories" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-orange-50">
               📂 Categories
-            </Link>
-            <Link href="/masters" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-orange-50">
-              👷 Masters
             </Link>
 
             {!_hasHydrated ? null : isAuthenticated() ? (

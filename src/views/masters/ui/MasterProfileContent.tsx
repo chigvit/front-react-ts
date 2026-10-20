@@ -363,12 +363,6 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
               >
                 Propose a Job
               </Link>
-              <Link
-                href={`/messages/${masterId}`}
-                className="mt-2 block w-full rounded-xl border border-gray-200 px-4 py-3 text-center text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Messages
-              </Link>
             </div>
 
             {/* Stats */}

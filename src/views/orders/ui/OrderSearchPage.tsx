@@ -14,6 +14,7 @@ import { Badge } from '@/shared/ui/Badge'
 import { Input } from '@/shared/ui/Input'
 import { Button } from '@/shared/ui/Button'
 import { OrderChat } from '@/widgets/order-chat/ui/OrderChat'
+import { guestFlowErrorMessage } from '@/shared/lib/authErrors'
 
 const guestSchema = z.object({
   firstName: z.string().min(2, 'Minimum 2 characters'),
@@ -70,28 +71,17 @@ export const OrderSearchPage = () => {
     refetchInterval: 60_000,
   })
 
-  const orderIds = useMemo<string[]>(() => (ordersData ?? []).map((o: any) => o.id), [ordersData])
-
   // My response to each order (from the server, not just local state) —
   // needed to see my response and the customer's answer after a page refresh.
   const { data: myResponsesData } = useQuery({
-    queryKey: ['my-responses', orderIds],
+    queryKey: ['my-responses', user?.id],
     queryFn: async () => {
-      const results = await Promise.all(
-        orderIds.map(id =>
-          apiClient.get(`/api/v1/orders/${id}/responses`)
-            .then(r => ({ id, responses: r.data.responses ?? [] }))
-            .catch(() => ({ id, responses: [] as any[] }))
-        )
-      )
+      const res = await apiClient.get('/api/v1/responses/my')
       const map: Record<string, any> = {}
-      results.forEach(({ id, responses }) => {
-        const mine = responses.find((r: any) => r.master_id === user?.id)
-        if (mine) map[id] = mine
-      })
+      for (const r of res.data.responses ?? []) map[r.order_id] = r
       return map
     },
-    enabled: orderIds.length > 0 && !!user?.id,
+    enabled: !!user?.id,
   })
 
   const myResponseByOrder: Record<string, any> = myResponsesData ?? {}
@@ -127,7 +117,7 @@ export const OrderSearchPage = () => {
     onSuccess: (_data, { orderId }) => {
       setResponseForm(prev => ({ ...prev, [orderId]: { message: '', price: '' } }))
       setResponseError(prev => ({ ...prev, [orderId]: '' }))
-      queryClient.invalidateQueries({ queryKey: ['my-responses', orderIds] })
+      queryClient.invalidateQueries({ queryKey: ['my-responses'] })
     },
     onError: (error: any, { orderId }) => {
       const message = error?.response?.data?.error ?? 'Failed to submit response. Please try again.'
@@ -182,8 +172,8 @@ export const OrderSearchPage = () => {
       setDevCode(res.data.dev_code)
       setSavedGuestPhone(data.phone)
       setAuthStep('verify')
-    } catch {
-      setAuthError('Failed to register. Please try again.')
+    } catch (err: any) {
+      setAuthError(guestFlowErrorMessage(err, 'Failed to register. Please try again.'))
     } finally {
       setIsAuthPending(false)
     }
@@ -230,7 +220,7 @@ export const OrderSearchPage = () => {
       closeAuthFlow()
     } catch (err: any) {
       const msg = err.response?.data?.error ?? ''
-      setAuthError(msg.includes('expired') ? 'Code expired.' : 'Incorrect code. Please try again.')
+      setAuthError(msg.includes('expired') ? 'Code expired.' : guestFlowErrorMessage(err, 'Incorrect code. Please try again.'))
     } finally {
       setIsAuthPending(false)
     }
@@ -249,8 +239,8 @@ export const OrderSearchPage = () => {
       setDevCode(res.data.dev_code)
       setSmsCode('')
       setResendMessage('A new code has been sent.')
-    } catch {
-      setAuthError('Failed to resend code. Please try again.')
+    } catch (err: any) {
+      setAuthError(guestFlowErrorMessage(err, 'Failed to resend code. Please try again.'))
     } finally {
       setIsResending(false)
     }

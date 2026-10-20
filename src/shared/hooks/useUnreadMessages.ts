@@ -34,30 +34,26 @@ export function useUnreadMessages(
     .map((o) => o.id as string)
 
   // For a master, threads before a master is accepted don't show up in the
-  // "my"/"incoming" lists (order.master_id is still empty there) — so we
-  // separately look at all open orders site-wide and keep the ones where
-  // this master has already left a response.
-  const { data: publicOpenOrders } = useQuery({
-    queryKey: ['public-open-orders'],
+  // "my"/"incoming" lists (order.master_id is still empty there) — so we take
+  // every order this master has responded to, in a single request.
+  const { data: masterThreads } = useQuery({
+    queryKey: ['my-responses-threads', myUserId],
     queryFn: async () => {
-      const res = await apiClient.get('/api/v1/orders')
-      return res.data.orders ?? []
+      const res = await apiClient.get('/api/v1/responses/my')
+      const responses: any[] = res.data.responses ?? []
+      const orderIds = new Set(responses.map((r) => r.order_id as string))
+      return [...orderIds].map((orderId): Thread => ({ orderId }))
     },
     enabled: myRole === 'master' && !!myUserId,
-    staleTime: 30_000,
     refetchInterval: 30_000,
   })
 
-  const candidateOrderIds: string[] =
-    myRole === 'master'
-      ? (publicOpenOrders ?? []).map((o: any) => o.id as string)
-      : openOrderIds
-
-  const { data: candidateThreads } = useQuery({
-    queryKey: ['unread-candidate-threads', myRole, candidateOrderIds.join(',')],
+  // A customer sees a separate thread with each candidate master of their open orders
+  const { data: customerThreads } = useQuery({
+    queryKey: ['unread-candidate-threads', openOrderIds.join(',')],
     queryFn: async () => {
       const results = await Promise.all(
-        candidateOrderIds.map((id) =>
+        openOrderIds.map((id) =>
           apiClient
             .get(`/api/v1/orders/${id}/responses`)
             .then((r) => ({ id, responses: r.data.responses ?? [] }))
@@ -66,23 +62,21 @@ export function useUnreadMessages(
       )
       const threads: Thread[] = []
       for (const { id, responses } of results) {
-        if (myRole === 'master') {
-          // a master sees only their own correspondence thread
-          if (responses.some((r: any) => r.master_id === myUserId)) {
-            threads.push({ orderId: id })
-          }
-        } else {
-          // a customer sees a separate thread with each candidate master
-          for (const r of responses) {
-            threads.push({ orderId: id, masterId: r.master_id })
-          }
+        for (const r of responses) {
+          threads.push({ orderId: id, masterId: r.master_id })
         }
       }
       return threads
     },
-    enabled: candidateOrderIds.length > 0,
+    enabled: myRole === 'customer' && openOrderIds.length > 0,
     refetchInterval: 30_000,
   })
+
+  const directIds = new Set(directThreads.map((t) => t.orderId))
+  const candidateThreads =
+    myRole === 'master'
+      ? (masterThreads ?? []).filter((t) => !directIds.has(t.orderId))
+      : customerThreads
 
   const threads: Thread[] = [...directThreads, ...(candidateThreads ?? [])]
   const threadsKey = threads.map((t) => `${t.orderId}:${t.masterId ?? ''}`).join(',')

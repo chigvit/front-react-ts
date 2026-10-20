@@ -9,6 +9,7 @@ import { Spinner } from '@/shared/ui/Spinner'
 import { useGeolocation } from '@/shared/hooks/useGeolocation'
 import { MasterProfileContent } from '@/views/masters/ui/MasterProfileContent'
 import { getAvatarUrl } from '@/shared/lib/avatarUrl'
+import { WorkTypePage } from './WorkTypePage'
 
 interface CategoryPageProps {
   id: number
@@ -67,7 +68,7 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
       })
       return res.data.masters ?? []
     },
-    enabled: selectedWorkTypeId ? true : categoryWorkTypeIds.length > 0,
+    enabled: !selectedWorkTypeId && categoryWorkTypeIds.length > 0,
   })
 
   const selectedWorkType = workTypesData?.find((wt: any) => wt.id === parseInt(selectedWorkTypeId ?? '0'))
@@ -78,6 +79,11 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
         <Spinner size="lg" />
       </div>
     )
+  }
+
+  // A selected work type gets its own landing page
+  if (selectedWorkType) {
+    return <WorkTypePage category={categoryData} workTypes={workTypesData ?? []} workTypeId={selectedWorkType.id} />
   }
 
   return (

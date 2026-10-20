@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -33,11 +34,18 @@ type FormData = z.infer<typeof schema>
 export const RegisterForm = () => {
   const { mutate: register, isPending, error } = useRegister()
 
-  const { register: formRegister, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
+  const { register: formRegister, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     mode: 'onBlur',
     defaultValues: { userRole: 'USER_TYPE_CUSTOMER' },
   })
+
+  // /register?role=master (e.g. "Become a specialist") preselects the master role
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('role') === 'master') {
+      setValue('userRole', 'USER_TYPE_MASTER')
+    }
+  }, [setValue])
 
   const onSubmit = (data: FormData) => register(data)
 
