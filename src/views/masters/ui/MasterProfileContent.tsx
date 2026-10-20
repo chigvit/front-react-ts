@@ -7,6 +7,7 @@ import { apiClient } from '@/shared/api/client'
 import { Spinner } from '@/shared/ui/Spinner'
 import { Lightbox } from '@/shared/ui/Lightbox'
 import { getAvatarUrl } from '@/shared/lib/avatarUrl'
+import { postcodeArea } from '@/shared/lib/format'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
@@ -163,7 +164,7 @@ export const MasterProfileContent = ({ masterId, showHero = true }: Props) => {
 
               {/* Location / experience */}
               <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
-                {profile.postcode && <span>📍 {profile.postcode}</span>}
+                {profile.postcode && <span>📍 {postcodeArea(profile.postcode)}</span>}
                 {mp?.experience_years > 0 && (
                   <span>🛠 {mp.experience_years} yrs experience</span>
                 )}

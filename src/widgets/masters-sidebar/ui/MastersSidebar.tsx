@@ -7,6 +7,7 @@ import { apiClient } from '@/shared/api/client'
 import { useGeolocation } from '@/shared/hooks/useGeolocation'
 import { Spinner } from '@/shared/ui/Spinner'
 import { getAvatarUrl } from '@/shared/lib/avatarUrl'
+import { postcodeArea } from '@/shared/lib/format'
 
 interface Props {
   workTypeId: number
@@ -132,7 +133,7 @@ export function MastersSidebar({ workTypeId, title, selectedMasterId, onSelectMa
                       {master.postcode && (
                         <div className="flex items-center gap-1.5">
                           <span>📍</span>
-                          <span className="font-medium text-gray-700">{master.postcode}</span>
+                          <span className="font-medium text-gray-700">{postcodeArea(master.postcode)}</span>
                         </div>
                       )}
                       {master.bio && (

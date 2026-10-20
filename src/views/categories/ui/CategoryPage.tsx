@@ -10,6 +10,7 @@ import { useGeolocation } from '@/shared/hooks/useGeolocation'
 import { MasterProfileContent } from '@/views/masters/ui/MasterProfileContent'
 import { getAvatarUrl } from '@/shared/lib/avatarUrl'
 import { WorkTypePage } from './WorkTypePage'
+import { postcodeArea } from '@/shared/lib/format'
 
 interface CategoryPageProps {
   id: number
@@ -178,7 +179,7 @@ export const CategoryPage = ({ id }: CategoryPageProps) => {
                             </h3>
                             {master.postcode && (
                               <p className="truncate text-xs text-gray-500">
-                                📍 {master.postcode}
+                                📍 {postcodeArea(master.postcode)}
                                 {master.distance_meters > 0 && (
                                   <span className="ml-1 text-gray-400">
                                     ({(master.distance_meters / 1000).toFixed(1)} km)

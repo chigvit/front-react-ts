@@ -8,6 +8,7 @@ import { Spinner } from '@/shared/ui/Spinner'
 import { useGeolocation } from '@/shared/hooks/useGeolocation'
 import { getAvatarUrl } from '@/shared/lib/avatarUrl'
 import { cn } from '@/shared/lib/cn'
+import { postcodeArea } from '@/shared/lib/format'
 
 // Leeds city centre — used until the browser shares a location.
 const DEFAULT_LAT = 53.8008
@@ -288,7 +289,7 @@ const MasterCard = ({ master, workTypeId, workTypeName }: { master: any; workTyp
             <p className="text-gray-500">🛠️ {workTypeName}</p>
             {master.postcode && (
               <p className="text-gray-500">
-                📍 {master.postcode}
+                📍 {postcodeArea(master.postcode)}
                 {master.distance_meters > 0 && (
                   <span className="text-gray-400"> · {(master.distance_meters / 1000).toFixed(1)} km away</span>
                 )}
