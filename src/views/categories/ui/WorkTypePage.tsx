@@ -197,7 +197,7 @@ export const WorkTypePage = ({ category, workTypes, workTypeId }: WorkTypePagePr
         </div>
 
         {/* Sidebar */}
-        <aside className="flex flex-col gap-4 lg:sticky lg:top-6 lg:self-start">
+        <aside className="flex flex-col gap-4 lg:self-start">
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <Link
               href={orderHref}
