@@ -10,6 +10,69 @@ import { Button } from '@/shared/ui/Button'
 
 const INITIAL_SHOW = 3
 
+// Quick links under the hero, each to a work type page (resolved by slug,
+// since ids depend on how the catalog was seeded).
+const iconProps = {
+  viewBox: '0 0 24 24',
+  className: 'h-9 w-9',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.4,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+}
+
+const POPULAR_SECTIONS = [
+  {
+    slug: 'sad-i-horod',
+    label: 'Garden',
+    icon: (
+      <svg {...iconProps}>
+        <path d="M12 21v-9" />
+        <path d="M12 12c0-3.5 2.5-6 6.5-6 0 3.5-2.5 6-6.5 6Z" />
+        <path d="M12 14c0-3-2.2-5-5.5-5 0 3 2.2 5 5.5 5Z" />
+        <path d="M5 21h14" />
+      </svg>
+    ),
+  },
+  {
+    slug: 'zbyrannia-mebliv',
+    label: 'Furniture Assembly',
+    icon: (
+      <svg {...iconProps}>
+        <path d="M6 4v16M18 4v16" />
+        <path d="M6 9h12M6 15h12" />
+        <path d="M4 20h4M16 20h4" />
+        <circle cx="12" cy="12" r="0.8" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    slug: 'vyviz-budivelnoho-smittia',
+    label: 'Junk Removal',
+    icon: (
+      <svg {...iconProps}>
+        <path d="M2 6h11v10H2z" />
+        <path d="M13 9h4.5l3.5 3.5V16h-8" />
+        <circle cx="6" cy="17.5" r="1.8" />
+        <circle cx="17" cy="17.5" r="1.8" />
+      </svg>
+    ),
+  },
+  {
+    slug: 'prybyrannia-kvartyr',
+    label: 'Cleaning',
+    icon: (
+      <svg {...iconProps}>
+        <path d="M9 3h5v3H9z" />
+        <path d="M14 4.5h3l1 2" />
+        <path d="M8 10a3 3 0 0 1 3-3h1a3 3 0 0 1 3 3v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1z" />
+        <path d="M11 6v1M8 13h7" />
+      </svg>
+    ),
+  },
+]
+
 const CATEGORY_COLORS = [
   { bg: 'bg-blue-100', text: 'text-blue-600' },
   { bg: 'bg-green-100', text: 'text-green-600' },
@@ -194,6 +257,34 @@ export const HomePage = () => {
             </svg>
           </div>
         </div>
+      </section>
+
+      {/* Popular sections */}
+      <section className="border-b border-gray-100 bg-white">
+        <nav
+          aria-label="Popular services"
+          className="mx-auto grid max-w-3xl grid-cols-2 gap-y-2 px-4 py-6 sm:grid-cols-4"
+        >
+          {POPULAR_SECTIONS.map((section) => {
+            const category = categoriesData?.find((cat: any) =>
+              cat.workTypes.some((wt: any) => wt.slug === section.slug)
+            )
+            const workType = category?.workTypes.find((wt: any) => wt.slug === section.slug)
+            const href = workType ? `/categories/${category.id}?work_type=${workType.id}` : '/categories'
+            return (
+              <Link
+                key={section.slug}
+                href={href}
+                className="group flex flex-col items-center gap-2 rounded-xl px-2 py-3 text-gray-400 transition-colors hover:text-orange-500"
+              >
+                {section.icon}
+                <span className="text-center text-sm text-gray-500 group-hover:text-orange-500">
+                  {section.label}
+                </span>
+              </Link>
+            )
+          })}
+        </nav>
       </section>
 
       {/* Categories */}
